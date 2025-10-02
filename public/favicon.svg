@@ -1,0 +1,16 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="32" height="32" fill="white"/>
+  
+  <!-- Left stack: U and H -->
+  <text x="6" y="12" font-family="serif" font-size="14" font-weight="bold" fill="#1e40af">U</text>
+  <text x="6" y="24" font-family="serif" font-size="14" font-weight="bold" fill="#6b7280">H</text>
+  
+  <!-- Center separator: two vertical lines -->
+  <line x1="14" y1="6" x2="14" y2="26" stroke="#6b7280" stroke-width="1"/>
+  <line x1="16" y1="6" x2="16" y2="26" stroke="#6b7280" stroke-width="1"/>
+  
+  <!-- Right stack: 2 and C -->
+  <text x="20" y="12" font-family="serif" font-size="14" font-weight="bold" fill="#1e40af">2</text>
+  <text x="20" y="24" font-family="serif" font-size="14" font-weight="bold" fill="#6b7280">C</text>
+</svg> 

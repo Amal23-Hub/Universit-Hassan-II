@@ -1,0 +1,165 @@
+UH2C - MATRICE DES FONCTIONNALITES ÉTENDUE
+
+| MODULES | FONCTIONNALITES | TACHES | SOUS TACHES | FE/BE | ESTIMATION J/H | AFFECTATION |
+|---------|-----------------|--------|-------------|-------|----------------|-------------|
+| PUBLICATIONS | Ajout manuel d'une publication | Formulaire d'ajout de la publication | Création de l'interface formulaire | FE | 12 | |
+| PUBLICATIONS | Ajout manuel d'une publication | Formulaire d'ajout de la publication | Validation des champs (client-side) | FE | 8 | |
+| PUBLICATIONS | Ajout manuel d'une publication | Formulaire d'ajout de la publication | API Create Publication (POST) | BE | 6 | |
+| PUBLICATIONS | Ajout manuel d'une publication | Formulaire d'ajout de la publication | Sauvegarde en base de données | BE | 3 | |
+| PUBLICATIONS | Ajout manuel d'une publication | Affichage de la liste des publications | Affichage de la liste des publications | FE | 10 | |
+| PUBLICATIONS | Ajout manuel d'une publication | Affichage de la liste des publications | API Read Publication (GET) | BE | 4 | |
+| PUBLICATIONS | Ajout manuel d'une publication | Modification publication | Modification publication (UI) | FE | 12 | |
+| PUBLICATIONS | Ajout manuel d'une publication | Modification publication | API Update Publication | BE | 6 | |
+| PUBLICATIONS | Ajout manuel d'une publication | Suppression publication | Suppression publication (UI + confirmation) | FE | 6 | |
+| PUBLICATIONS | Ajout manuel d'une publication | Suppression publication | API Delete Publication (DELETE) | BE | 3 | |
+| PUBLICATIONS | Ajout manuel d'une publication | Affichage détail publication | Affichage détail publication (UI) | FE | 8 | |
+| PUBLICATIONS | Ajout manuel d'une publication | Affichage détail publication | API Détail Publication (GET/{id}) | BE | 3 | |
+| PUBLICATIONS | Ajout automatique des publications | Consommation API WOS | Connexion API WOS | BE | 8 | |
+| PUBLICATIONS | Ajout automatique des publications | Consommation API WOS | Traitement des données WOS | BE | 12 | |
+| PUBLICATIONS | Ajout automatique des publications | Consommation API WOS | Insertion automatique publications | BE | 6 | |
+| PUBLICATIONS | Ajout automatique des publications | Consommation API SCOPUS | Connexion API SCOPUS | BE | 8 | |
+| PUBLICATIONS | Ajout automatique des publications | Consommation API SCOPUS | Traitement des données SCOPUS | BE | 12 | |
+| PUBLICATIONS | Ajout automatique des publications | Consommation API SCOPUS | Insertion automatique publications | BE | 6 | |
+| COMMUNICATIONS | Ajout manuel d'une communication | Formulaire d'ajout de communication | Interface de saisie | FE | 10 | |
+| COMMUNICATIONS | Ajout manuel d'une communication | Formulaire d'ajout de communication | Validation des données | FE | 6 | |
+| COMMUNICATIONS | Ajout manuel d'une communication | Formulaire d'ajout de communication | API Create Communication | BE | 6 | |
+| COMMUNICATIONS | Ajout automatique des communications | Consommation API HAL | API HAL Integration | BE | 8 | |
+| COMMUNICATIONS | Ajout automatique des communications | Consommation API HAL | Traitement données HAL | BE | 10 | |
+| COMMUNICATIONS | Ajout automatique des communications | Consommation API arXiv | API arXiv Integration | BE | 8 | |
+| COMMUNICATIONS | Ajout automatique des communications | Consommation API arXiv | Traitement données arXiv | BE | 10 | |
+| OUVRAGES | Ajout manuel d'un ouvrage | Gestion des ouvrages | Formulaire ouvrage | FE | 14 | |
+| OUVRAGES | Ajout manuel d'un ouvrage | Gestion des ouvrages | API Create Book | BE | 6 | |
+| OUVRAGES | Ajout automatique des ouvrages | Intégration API WOS | API WOS Books Integration | BE | 10 | |
+| OUVRAGES | Ajout automatique des ouvrages | Intégration API SCOPUS | API SCOPUS Books Integration | BE | 10 | |
+| BREVETS ET DROITS | Ajout manuel d'un brevet | Gestion des brevets | Interface brevet | FE | 12 | |
+| BREVETS ET DROITS | Ajout manuel d'un brevet | Gestion des brevets | API Patent Management | BE | 8 | |
+| BREVETS ET DROITS | Ajout automatique des brevets | Intégration API WOS | API WOS Patents Integration | BE | 10 | |
+| BREVETS ET DROITS | Ajout automatique des brevets | Intégration API SCOPUS | API SCOPUS Patents Integration | BE | 10 | |
+| DISTINCTIONS ET PRIX | Ajout manuel d'une distinction | Gestion des distinctions | Interface distinction | FE | 10 | |
+| DISTINCTIONS ET PRIX | Ajout manuel d'une distinction | Gestion des distinctions | API Award Management | BE | 6 | |
+| DISTINCTIONS ET PRIX | Ajout automatique des distinctions | Intégration API WOS | API WOS Awards Integration | BE | 8 | |
+| DISTINCTIONS ET PRIX | Ajout automatique des distinctions | Intégration API SCOPUS | API SCOPUS Awards Integration | BE | 8 | |
+| GESTION UTILISATEURS | Système d'authentification | Authentification | Système de login/logout | BE | 16 | |
+| GESTION UTILISATEURS | Système d'authentification | Authentification | Gestion des sessions | BE | 12 | |
+| GESTION UTILISATEURS | Gestion des rôles | Permissions | Système de permissions | BE | 20 | |
+| GESTION UTILISATEURS | Gestion des rôles | Permissions | Interface de gestion des rôles | FE | 16 | |
+| VALIDATION | Workflow de validation | Processus | Workflow de validation automatique | BE | 24 | |
+| VALIDATION | Workflow de validation | Processus | Notifications automatiques | BE | 12 | |
+| VALIDATION | Workflow de validation | Processus | Historique des validations | BE | 16 | |
+| VALIDATION | Workflow de validation | Interface | Interface de validation pour experts | FE | 20 | |
+| PROGRAMMES | Création d'un programme | Gestion des programmes | Interface de création programme | FE | 16 | |
+| PROGRAMMES | Création d'un programme | Gestion des programmes | API Create Programme | BE | 8 | |
+| PROGRAMMES | Création d'un programme | Gestion des programmes | Validation des données programme | BE | 6 | |
+| PROGRAMMES | Modification d'un programme | Gestion des programmes | Interface de modification programme | FE | 14 | |
+| PROGRAMMES | Modification d'un programme | Gestion des programmes | API Update Programme | BE | 8 | |
+| PROGRAMMES | Suppression d'un programme | Gestion des programmes | Interface de suppression programme | FE | 8 | |
+| PROGRAMMES | Suppression d'un programme | Gestion des programmes | API Delete Programme | BE | 4 | |
+| PROGRAMMES | Affichage des programmes | Gestion des programmes | Liste des programmes | FE | 12 | |
+| PROGRAMMES | Affichage des programmes | Gestion des programmes | API Read Programmes | BE | 6 | |
+| PROGRAMMES | Affichage des programmes | Gestion des programmes | Détail programme | FE | 10 | |
+| PROGRAMMES | Affichage des programmes | Gestion des programmes | API Détail Programme | BE | 4 | |
+| APPELS À PROJETS | Création d'un appel à projet | Gestion des appels | Interface de création appel | FE | 20 | |
+| APPELS À PROJETS | Création d'un appel à projet | Gestion des appels | API Create Appel Projet | BE | 12 | |
+| APPELS À PROJETS | Création d'un appel à projet | Gestion des appels | Validation des données appel | BE | 8 | |
+| APPELS À PROJETS | Modification d'un appel | Gestion des appels | Interface de modification appel | FE | 18 | |
+| APPELS À PROJETS | Modification d'un appel | Gestion des appels | API Update Appel Projet | BE | 10 | |
+| APPELS À PROJETS | Suppression d'un appel | Gestion des appels | Interface de suppression appel | FE | 10 | |
+| APPELS À PROJETS | Suppression d'un appel | Gestion des appels | API Delete Appel Projet | BE | 6 | |
+| APPELS À PROJETS | Affichage des appels | Gestion des appels | Liste des appels à projets | FE | 14 | |
+| APPELS À PROJETS | Affichage des appels | Gestion des appels | API Read Appels Projets | BE | 8 | |
+| APPELS À PROJETS | Affichage des appels | Gestion des appels | Détail appel à projet | FE | 12 | |
+| APPELS À PROJETS | Affichage des appels | Gestion des appels | API Détail Appel Projet | BE | 6 | |
+| APPELS À PROJETS | Soumission de projet | Soumission | Interface de soumission projet | FE | 24 | |
+| APPELS À PROJETS | Soumission de projet | Soumission | API Submit Projet | BE | 16 | |
+| APPELS À PROJETS | Soumission de projet | Soumission | Validation soumission | BE | 12 | |
+| PROJETS RETENUS | Gestion des projets retenus | Suivi des projets | Interface liste projets retenus | FE | 16 | |
+| PROJETS RETENUS | Gestion des projets retenus | Suivi des projets | API Read Projets Retenus | BE | 8 | |
+| PROJETS RETENUS | Gestion des projets retenus | Suivi des projets | Détail projet retenu | FE | 14 | |
+| PROJETS RETENUS | Gestion des projets retenus | Suivi des projets | API Détail Projet Retenu | BE | 6 | |
+| PROJETS RETENUS | Gestion des projets retenus | Suivi des projets | Interface de suivi avancement | FE | 20 | |
+| PROJETS RETENUS | Gestion des projets retenus | Suivi des projets | API Update Avancement | BE | 12 | |
+| PROJETS RETENUS | Gestion des projets retenus | Suivi des projets | Rapports d'avancement | FE | 16 | |
+| PROJETS RETENUS | Gestion des projets retenus | Suivi des projets | API Generate Rapport | BE | 10 | |
+| PROJETS NON RETENUS | Gestion des projets non retenus | Suivi des projets | Interface liste projets non retenus | FE | 12 | |
+| PROJETS NON RETENUS | Gestion des projets non retenus | Suivi des projets | API Read Projets Non Retenus | BE | 6 | |
+| PROJETS NON RETENUS | Gestion des projets non retenus | Suivi des projets | Détail projet non retenu | FE | 10 | |
+| PROJETS NON RETENUS | Gestion des projets non retenus | Suivi des projets | API Détail Projet Non Retenu | BE | 4 | |
+| PROJETS NON RETENUS | Gestion des projets non retenus | Suivi des projets | Interface de feedback | FE | 14 | |
+| PROJETS NON RETENUS | Gestion des projets non retenus | Suivi des projets | API Save Feedback | BE | 8 | |
+| PROJETS SOUMIS | Gestion des projets soumis | Suivi des projets | Interface liste projets soumis | FE | 14 | |
+| PROJETS SOUMIS | Gestion des projets soumis | Suivi des projets | API Read Projets Soumis | BE | 8 | |
+| PROJETS SOUMIS | Gestion des projets soumis | Suivi des projets | Détail projet soumis | FE | 12 | |
+| PROJETS SOUMIS | Gestion des projets soumis | Suivi des projets | API Détail Projet Soumis | BE | 6 | |
+| PROJETS SOUMIS | Gestion des projets soumis | Suivi des projets | Interface de modification projet | FE | 18 | |
+| PROJETS SOUMIS | Gestion des projets soumis | Suivi des projets | API Update Projet Soumis | BE | 10 | |
+| PROJETS SOUMIS | Gestion des projets soumis | Suivi des projets | Interface de retrait projet | FE | 8 | |
+| PROJETS SOUMIS | Gestion des projets soumis | Suivi des projets | API Withdraw Projet | BE | 6 | |
+| ÉVALUATION DES PROJETS | Processus d'évaluation | Évaluation par experts | Interface d'évaluation expert | FE | 24 | |
+| ÉVALUATION DES PROJETS | Processus d'évaluation | Évaluation par experts | API Submit Evaluation | BE | 12 | |
+| ÉVALUATION DES PROJETS | Processus d'évaluation | Évaluation par experts | Calcul score évaluation | BE | 16 | |
+| ÉVALUATION DES PROJETS | Processus d'évaluation | Évaluation par experts | Interface de notation | FE | 18 | |
+| ÉVALUATION DES PROJETS | Processus d'évaluation | Évaluation par experts | API Save Notation | BE | 10 | |
+| ÉVALUATION DES PROJETS | Processus d'évaluation | Évaluation par experts | Génération rapport évaluation | BE | 14 | |
+| ÉVALUATION DES PROJETS | Processus d'évaluation | Évaluation par experts | Interface rapport évaluation | FE | 12 | |
+| NOTIFICATIONS | Système de notifications | Notifications automatiques | Configuration notifications | FE | 16 | |
+| NOTIFICATIONS | Système de notifications | Notifications automatiques | API Send Notification | BE | 12 | |
+| NOTIFICATIONS | Système de notifications | Notifications automatiques | Template notifications | BE | 8 | |
+| NOTIFICATIONS | Système de notifications | Notifications automatiques | Interface gestion notifications | FE | 14 | |
+| NOTIFICATIONS | Système de notifications | Notifications automatiques | API Read Notifications | BE | 6 | |
+| NOTIFICATIONS | Système de notifications | Notifications automatiques | Marquer comme lu | BE | 4 | |
+| NOTIFICATIONS | Système de notifications | Notifications automatiques | Interface historique notifications | FE | 10 | |
+| RAPPORTS ET STATISTIQUES | Génération de rapports | Rapports de projets | Interface génération rapports | FE | 20 | |
+| RAPPORTS ET STATISTIQUES | Génération de rapports | Rapports de projets | API Generate Rapport | BE | 16 | |
+| RAPPORTS ET STATISTIQUES | Génération de rapports | Rapports de projets | Export PDF/Excel | BE | 12 | |
+| RAPPORTS ET STATISTIQUES | Génération de rapports | Rapports de projets | Interface visualisation données | FE | 18 | |
+| RAPPORTS ET STATISTIQUES | Statistiques | Tableaux de bord | Interface dashboard | FE | 24 | |
+| RAPPORTS ET STATISTIQUES | Statistiques | Tableaux de bord | API Get Statistics | BE | 14 | |
+| RAPPORTS ET STATISTIQUES | Statistiques | Tableaux de bord | Graphiques et visualisations | FE | 20 | |
+| RAPPORTS ET STATISTIQUES | Statistiques | Tableaux de bord | API Chart Data | BE | 10 | |
+| CADRAGE ET SPÉCIFICATIONS | Analyse des besoins | Étude préliminaire | Analyse des besoins utilisateurs | BE | 16 | |
+| CADRAGE ET SPÉCIFICATIONS | Analyse des besoins | Étude préliminaire | Étude de l'existant | BE | 12 | |
+| CADRAGE ET SPÉCIFICATIONS | Analyse des besoins | Étude préliminaire | Définition de l'architecture | BE | 20 | |
+| CADRAGE ET SPÉCIFICATIONS | Définition des spécifications | Rédaction des spécifications techniques | Rédaction du cahier des charges | BE | 24 | |
+| CADRAGE ET SPÉCIFICATIONS | Définition des spécifications | Rédaction des spécifications techniques | Spécifications fonctionnelles | BE | 32 | |
+| CADRAGE ET SPÉCIFICATIONS | Définition des spécifications | Rédaction des spécifications techniques | Spécifications techniques | BE | 28 | |
+| CADRAGE ET SPÉCIFICATIONS | Définition des spécifications | Rédaction des spécifications techniques | Interface de gestion des spécifications | FE | 16 | |
+| TEST ET RECETTE | Tests unitaires | Planification des tests | Plan de test | BE | 12 | |
+| TEST ET RECETTE | Tests unitaires | Exécution des tests | Tests unitaires | BE | 40 | |
+| TEST ET RECETTE | Tests d'intégration | Exécution des tests | Tests d'intégration | BE | 32 | |
+| TEST ET RECETTE | Tests de performance | Exécution des tests | Tests de performance | BE | 20 | |
+| TEST ET RECETTE | Tests de sécurité | Exécution des tests | Tests de sécurité | BE | 16 | |
+| TEST ET RECETTE | Tests de recette | Validation des résultats | Tests de recette utilisateur | FE | 24 | |
+| TEST ET RECETTE | Tests de recette | Validation des résultats | Interface de suivi des tests | FE | 12 | |
+| TEST ET RECETTE | Tests de recette | Validation des résultats | Rapport de tests | BE | 8 | |
+| TEST ET RECETTE | Tests de recette | Validation des résultats | Correction des bugs | BE | 20 | |
+| RÉDACTION DES LIVRABLES | Documentation technique | Rédaction de la documentation | Documentation technique | BE | 24 | |
+| RÉDACTION DES LIVRABLES | Guide utilisateur | Création des guides | Guide d'installation | BE | 12 | |
+| RÉDACTION DES LIVRABLES | Guide utilisateur | Création des guides | Guide utilisateur | FE | 20 | |
+| RÉDACTION DES LIVRABLES | Guide administrateur | Création des guides | Guide administrateur | BE | 16 | |
+| RÉDACTION DES LIVRABLES | Plan de formation | Préparation de la formation | Plan de formation | BE | 12 | |
+| RÉDACTION DES LIVRABLES | Supports de formation | Préparation de la formation | Supports de formation | FE | 16 | |
+| RÉDACTION DES LIVRABLES | Vidéos tutoriels | Préparation de la formation | Vidéos tutoriels | FE | 24 | |
+| RÉDACTION DES LIVRABLES | FAQ et base de connaissances | Préparation de la formation | FAQ et base de connaissances | FE | 12 | |
+| RÉDACTION DES LIVRABLES | Interface de documentation | Préparation de la formation | Interface de documentation | FE | 8 | |
+| DÉPLOIEMENT ET MAINTENANCE | Déploiement en production | Configuration de l'environnement | Configuration serveur | BE | 16 | |
+| DÉPLOIEMENT ET MAINTENANCE | Déploiement en production | Mise en production | Déploiement initial | BE | 12 | |
+| DÉPLOIEMENT ET MAINTENANCE | Déploiement en production | Mise en production | Tests de production | BE | 8 | |
+| DÉPLOIEMENT ET MAINTENANCE | Maintenance évolutive | Support utilisateur | Monitoring et alertes | BE | 12 | |
+| DÉPLOIEMENT ET MAINTENANCE | Maintenance évolutive | Support utilisateur | Sauvegarde et sécurité | BE | 16 | |
+| DÉPLOIEMENT ET MAINTENANCE | Maintenance évolutive | Support utilisateur | Support utilisateur | BE | 20 | |
+| DÉPLOIEMENT ET MAINTENANCE | Maintenance évolutive | Support utilisateur | Maintenance corrective | BE | 16 | |
+| DÉPLOIEMENT ET MAINTENANCE | Maintenance évolutive | Support utilisateur | Interface de monitoring | FE | 12 | |
+
+RÉCAPITULATIF :
+- Modules existants : ~280H
+- Nouveaux modules fonctionnels : ~400H
+- Nouveaux modules programmes/projets : ~600H
+- Modules cadrage/test/livrables : ~400H
+- TOTAL ESTIMÉ : ~1680H
+
+PHASES DE DÉVELOPPEMENT :
+1. Phase 1 - Cadrage et Spécifications (120H)
+2. Phase 2 - Développement Core Publications/Communications (280H)
+3. Phase 3 - Développement Programmes et Projets (600H)
+4. Phase 4 - Tests et Recette (400H)
+5. Phase 5 - Livrables et Formation (280H) 
