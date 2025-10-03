@@ -1,5 +1,5 @@
 "use client"
-
+import { publicationService } from "@/lib/services/publicationManualService";
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,7 +15,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Textarea } from "@/components/ui/textarea"
-
 interface Member {
   id: string
   name: string
@@ -83,6 +82,7 @@ interface Publication {
 }
 
 export default function PublicationsPage() {
+  // const publications = await publicationService.getAll();
   const { toast } = useToast()
   const [selectedPublication, setSelectedPublication] = useState<Publication | null>(null)
   const [detailDialogOpen, setDetailDialogOpen] = useState(false)

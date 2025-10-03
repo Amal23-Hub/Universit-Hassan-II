@@ -23,62 +23,70 @@ import { DemandeParticipation, listeDemandesParticipationsManifestations } from 
 
 import { useParticipation } from '@/lib/participation-context'
 
+// Interface pour les manifestations existantes
+interface ManifestationExistante {
+  id: string
+  nature: string
+  intitule: string
+  dateDebut: string
+  dateFin: string
+  ville: string
+  pays: string
+  statut: "Validée" | "En attente" | "Rejetée"
+}
+
 //DATA chercheurs
 const chercheurs: string[] = [
   "Naciri Mohamed", "Kadiri Jawad", "Amrani Lamia", "yhyawi Fouad", "Amrawi Imane"
 ]
 
-// Données d'exemple pour les manifestations existantes
-const manifestationsExistantes = [
+// Données de manifestations existantes (simulées)
+const manifestationsExistantes: ManifestationExistante[] = [
   {
-    id: 1,
-    intitule: "Conférence Internationale sur l'Intelligence Artificielle",
+    id: "1",
     nature: "Conférence",
-    ville: "Paris",
-    pays: "France",
+    intitule: "International Conference on Artificial Intelligence",
     dateDebut: "2024-06-15",
     dateFin: "2024-06-17",
-    organisateur: "Université de Paris",
-    description: "Conférence internationale sur les dernières avancées en intelligence artificielle"
+    ville: "Paris",
+    pays: "France",
+    statut: "Validée"
   },
   {
-    id: 2,
-    intitule: "Séminaire sur les Technologies Émergentes",
-    nature: "Séminaire",
-    ville: "Berlin",
-    pays: "Allemagne",
-    dateDebut: "2024-07-20",
-    dateFin: "2024-07-21",
-    organisateur: "Institut de Technologie de Berlin",
-    description: "Séminaire dédié aux technologies émergentes et leur impact sur la société"
-  },
-  {
-    id: 3,
-    intitule: "Congrès International de Mathématiques",
+    id: "2",
     nature: "Congrès",
-    ville: "Madrid",
-    pays: "Espagne",
-    dateDebut: "2024-08-10",
-    dateFin: "2024-08-15",
-    organisateur: "Université Complutense de Madrid",
-    description: "Le plus grand congrès de mathématiques au monde"
-  },
-  {
-    id: 4,
-    intitule: "Workshop sur l'Apprentissage Automatique",
-    nature: "Workshop",
+    intitule: "World Congress on Machine Learning",
+    dateDebut: "2024-07-20",
+    dateFin: "2024-07-25",
     ville: "Londres",
     pays: "Royaume-Uni",
+    statut: "Validée"
+  },
+  {
+    id: "3",
+    nature: "Séminaire",
+    intitule: "Advanced Data Science Workshop",
+    dateDebut: "2024-08-10",
+    dateFin: "2024-08-12",
+    ville: "Berlin",
+    pays: "Allemagne",
+    statut: "En attente"
+  },
+  {
+    id: "4",
+    nature: "Colloque",
+    intitule: "Digital Transformation in Education",
     dateDebut: "2024-09-05",
     dateFin: "2024-09-07",
-    organisateur: "Imperial College London",
-    description: "Workshop intensif sur les techniques d'apprentissage automatique"
+    ville: "Madrid",
+    pays: "Espagne",
+    statut: "Validée"
   }
 ]
 
 export default function ParticipationManifestationMember() {
 
-/***************Traitement****************/
+  /***************Traitement****************/
   const [searchTerm, setSearchTerm] = useState("")
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [yearFilter, setYearFilter] = useState<string>("all")
@@ -97,67 +105,6 @@ export default function ParticipationManifestationMember() {
   // État pour les villes disponibles basé sur le pays sélectionné
   const [villesDisponibles, setVillesDisponibles] = useState<string[]>([])
 
-  // États pour le processus de participation
-  const [isSearchMode, setIsSearchMode] = useState(true) // true = recherche, false = création
-  const [selectedManifestation, setSelectedManifestation] = useState<any>(null)
-  const [searchResults, setSearchResults] = useState<any[]>([])
-  const [isSearching, setIsSearching] = useState(false)
-
-  // Fonction de recherche de manifestations existantes
-  const searchManifestations = (searchTerm: string) => {
-    if (!searchTerm.trim()) {
-      setSearchResults([])
-      return
-    }
-
-    setIsSearching(true)
-    
-    // Simulation d'une recherche avec délai
-    setTimeout(() => {
-      const results = manifestationsExistantes.filter(manifestation => {
-        const searchLower = searchTerm.toLowerCase()
-        return (
-          manifestation.intitule.toLowerCase().includes(searchLower) ||
-          manifestation.ville.toLowerCase().includes(searchLower) ||
-          manifestation.pays.toLowerCase().includes(searchLower) ||
-          manifestation.dateDebut.includes(searchTerm) ||
-          manifestation.dateFin.includes(searchTerm)
-        )
-      })
-      
-      setSearchResults(results)
-      setIsSearching(false)
-    }, 500)
-  }
-
-  // Fonction pour sélectionner une manifestation
-  const selectManifestation = (manifestation: any) => {
-    setSelectedManifestation(manifestation)
-    // Pré-remplir le formulaire avec les données de la manifestation
-    setFormDataParticipation(prev => ({
-      ...prev,
-      intituleManifestation: manifestation.intitule,
-      paysManifestation: manifestation.pays,
-      villeManifestation: manifestation.ville,
-      dateManifestation: manifestation.dateDebut,
-      natureManifestation: manifestation.nature as any
-    }))
-  }
-
-  // Fonction pour créer une nouvelle manifestation
-  const createNewManifestation = () => {
-    setIsSearchMode(false)
-    setSelectedManifestation(null)
-    resetFormDataParticipation()
-  }
-
-  // Fonction pour retourner à la recherche
-  const backToSearch = () => {
-    setIsSearchMode(true)
-    setSelectedManifestation(null)
-    setSearchResults([])
-    setSearchTerm("")
-  }
   
   const filteredDemandesParticipations = demandesParticipations.filter((item) => {
     const matchesSearch =
@@ -181,6 +128,16 @@ export default function ParticipationManifestationMember() {
 
   /* Traitements Globaes demandes participations manifestations */
   const [isModalOpenParticipation, setIsModalOpenParticipation] = useState(false)
+  
+  // États pour le processus de participation
+  const [etapeProcessus, setEtapeProcessus] = useState<"recherche" | "selection" | "nouvelle">("recherche")
+  const [manifestationSelectionnee, setManifestationSelectionnee] = useState<ManifestationExistante | null>(null)
+  const [rechercheManifestation, setRechercheManifestation] = useState("")
+  const [filtreVilleManifestation, setFiltreVilleManifestation] = useState("")
+  const [filtrePaysManifestation, setFiltrePaysManifestation] = useState("")
+  const [filtreDateDebutManifestation, setFiltreDateDebutManifestation] = useState("")
+  const [filtreDateFinManifestation, setFiltreDateFinManifestation] = useState("")
+  const [justificatifParticipation, setJustificatifParticipation] = useState<File | null>(null)
 
   const [formDataParticipation, setFormDataParticipation] = useState({
     natureManifestation: "Congrès" as "Congrès" | "Conférence" | "Séminaire" | "Colloque" | "Workshop" | "Stage",
@@ -189,6 +146,7 @@ export default function ParticipationManifestationMember() {
     paysManifestation: "",
     villeManifestation: "",
     dateManifestation: "",
+    dateFinManifestation: "",
     // Nouveaux champs pour les avis
     avisResponsableStructure: "",
     avisCommissionRechercheEtablissement: "",
@@ -206,6 +164,7 @@ export default function ParticipationManifestationMember() {
     }
   })
 
+
   const resetFormDataParticipation = () => {
     setFormDataParticipation({
       natureManifestation: "Congrès" as "Congrès" | "Conférence" | "Séminaire" | "Colloque" | "Workshop" | "Stage",
@@ -214,6 +173,7 @@ export default function ParticipationManifestationMember() {
       paysManifestation: "",
       villeManifestation: "",
       dateManifestation: "",
+      dateFinManifestation: "",
       // Nouveaux champs pour les avis
       avisResponsableStructure: "",
       avisCommissionRechercheEtablissement: "",
@@ -232,6 +192,93 @@ export default function ParticipationManifestationMember() {
     })
   }
 
+  // Fonction pour filtrer les manifestations existantes
+  const manifestationsFiltrees = manifestationsExistantes.filter((manifestation) => {
+    const matchesRecherche = manifestation.intitule.toLowerCase().includes(rechercheManifestation.toLowerCase()) ||
+                            manifestation.ville.toLowerCase().includes(rechercheManifestation.toLowerCase()) ||
+                            manifestation.pays.toLowerCase().includes(rechercheManifestation.toLowerCase())
+    const matchesVille = !filtreVilleManifestation || manifestation.ville.toLowerCase().includes(filtreVilleManifestation.toLowerCase())
+    const matchesPays = !filtrePaysManifestation || manifestation.pays.toLowerCase().includes(filtrePaysManifestation.toLowerCase())
+    const matchesDateDebut = !filtreDateDebutManifestation || manifestation.dateDebut >= filtreDateDebutManifestation
+    const matchesDateFin = !filtreDateFinManifestation || manifestation.dateFin <= filtreDateFinManifestation
+    
+    return matchesRecherche && matchesVille && matchesPays && matchesDateDebut && matchesDateFin
+  })
+
+  // Fonction pour sélectionner une manifestation existante
+  const selectionnerManifestation = (manifestation: ManifestationExistante) => {
+    setManifestationSelectionnee(manifestation)
+    setEtapeProcessus("selection")
+  }
+
+  // Fonction pour créer une nouvelle manifestation
+  const creerNouvelleManifestation = () => {
+    setEtapeProcessus("nouvelle")
+  }
+
+  // Fonction pour revenir à la recherche
+  const retourRecherche = () => {
+    setEtapeProcessus("recherche")
+    setManifestationSelectionnee(null)
+    setRechercheManifestation("")
+    setFiltreVilleManifestation("")
+    setFiltrePaysManifestation("")
+    setFiltreDateDebutManifestation("")
+    setFiltreDateFinManifestation("")
+  }
+
+  // Fonction pour finaliser la participation
+  const finaliserParticipation = () => {
+    if (manifestationSelectionnee) {
+      // Créer une demande de participation avec la manifestation sélectionnée
+      const newDemandeParticipation: DemandeParticipation = {
+        id: Date.now().toString(),
+        nomPrenomDemandeur: nomPrenomUserConnecte,
+        directeurTheseDoctorant: "",
+        gsm: "",
+        email: "",
+        fonction: "Chercheur" as "Chercheur" | "Enseignant chercheur",
+        etablissement: "",
+        nomLaboratoire: "",
+        discipline: "",
+        natureManifestation: manifestationSelectionnee.nature as "Congrès" | "Conférence" | "Séminaire" | "Colloque" | "Workshop" | "Stage",
+        naturePriseEnCharge: formDataParticipation.naturePriseEnCharge,
+        intituleManifestation: manifestationSelectionnee.intitule,
+        paysManifestation: manifestationSelectionnee.pays,
+        villeManifestation: manifestationSelectionnee.ville,
+        dateManifestation: manifestationSelectionnee.dateDebut,
+        avisResponsableStructure: "",
+        avisCommissionRechercheEtablissement: "",
+        avisResponsableEtablissement: "",
+        avisCommissionRechercheConseilUniversite: "",
+        documentsFournis: {
+          demandeOfficielle: justificatifParticipation,
+          lettreInvitation: null,
+          programmeManifestation: null,
+          resumeCommunication: null,
+          formulaireMobilite: null,
+          copieCarteEtudiant: null,
+          rapportMission: null
+        },
+        statut: "En attente",
+        dateCreation: new Date().toISOString().split('T')[0]
+      }
+
+      if (addDemandeParticipation) {
+        addDemandeParticipation(newDemandeParticipation)
+        toast({
+          title: "Participation ajoutée",
+          description: "Votre demande de participation a été enregistrée avec succès"
+        })
+      }
+
+      setIsModalOpenParticipation(false)
+      setEtapeProcessus("recherche")
+      setManifestationSelectionnee(null)
+      setJustificatifParticipation(null)
+    }
+  }
+
   // Fonction pour gérer le téléchargement des fichiers
   const handleFileUpload = (field: keyof typeof formDataParticipation.documentsFournis, file: File | null) => {
     setFormDataParticipation((prev) => ({
@@ -248,26 +295,14 @@ export default function ParticipationManifestationMember() {
     e.preventDefault()
 
     //validations
-    if (selectedManifestation) {
-      // Cas d'une manifestation existante - validation du justificatif
-      if (!formDataParticipation.documentsFournis.lettreInvitation) {
-        toast({
-          title: "Erreur de validation",
-          description: "Veuillez télécharger un justificatif de participation",
-          variant: "destructive"
-        })
-        return
-      }
-    } else {
-      // Cas d'une nouvelle manifestation - validation des champs obligatoires
-      if (!formDataParticipation.intituleManifestation || !formDataParticipation.dateManifestation) {
-        toast({
-          title: "Erreur de validation",
-          description: "Veuillez renseigner l'intitulé et la date de la manifestation",
-          variant: "destructive"
-        })
-        return
-      }
+
+    if (!formDataParticipation.intituleManifestation || !formDataParticipation.dateManifestation) {
+      toast({
+        title: "Erreur de validation",
+        description: "Veuillez renseigner l'intitulé et la date de la manifestation",
+        variant: "destructive"
+      })
+      return
     }
 
     const newDemandeParticipation: DemandeParticipation = {
@@ -308,33 +343,19 @@ export default function ParticipationManifestationMember() {
     }
 
     
-    demandesParticipations.map(((ddeParticip) => {
+    demandesParticipations.map((ddeParticip) => {
       console.log('Demande participation:', ddeParticip)
       console.log("-------------------")
-    }))
+    })
 
-    // Message de succès différencié
-    if (selectedManifestation) {
-      toast({
-        title: "Participation confirmée",
-        description: `Votre participation à "${selectedManifestation.intitule}" a été enregistrée avec succès`
-      })
-    } else {
-      toast({
-        title: "Nouvelle manifestation créée",
-        description: "Votre demande de participation à une nouvelle manifestation a été soumise à la validation de la division Recherche"
-      })
-    }
+    toast({title: "Nouvelle demande participation manifestation ajoutée"})
+
 
     setIsModalOpenParticipation(false)
-    setSelectedManifestation(null)
-    setIsSearchMode(true)
-    setSearchResults([])
-    setSearchTerm("")
     resetFormDataParticipation()
   }
 
-/***************vue****************/
+  /***************vue****************/
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
@@ -350,19 +371,14 @@ export default function ParticipationManifestationMember() {
                 </div>
                 <Dialog open={isModalOpenParticipation} onOpenChange={setIsModalOpenParticipation}>
                   <DialogTrigger asChild>
-                    <Button onClick={() => {
-                      setIsSearchMode(true)
-                      setSearchResults([])
-                      setSearchTerm("")
-                      setSelectedManifestation(null)
-                    }}>
+                    <Button onClick={resetFormDataParticipation}>
                       <Plus className="h-4 w-4 mr-2" />
                       Demander une participation à une manifestation
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
                       <DialogTitle className="sr-only">
-                        Demande de participation à une manifestation scientifique
+                        Processus de Participation à une manifestation
                       </DialogTitle>
                       
                       {/* En-tête unifié du formulaire */}
@@ -374,129 +390,295 @@ export default function ParticipationManifestationMember() {
                             </div>
                             <div>
                               <h2 className="text-sm font-bold text-uh2c-blue">
-                                DEMANDE DE PARTICIPATION À UNE MANIFESTATION SCIENTIFIQUE
+                                PROCESSUS DE PARTICIPATION À UNE MANIFESTATION
                               </h2>
                               <p className="text-xs text-gray-600 mt-0.5">
-                                {isSearchMode 
-                                  ? "Recherchez une manifestation existante ou créez-en une nouvelle"
-                                  : "Remplissez tous les champs obligatoires pour créer une nouvelle manifestation"
-                                }
+                                Recherchez une manifestation existante ou créez-en une nouvelle
                               </p>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      {/* Interface de recherche ou création */}
-                      {isSearchMode ? (
+                      {/* Étapes du processus */}
+                      {etapeProcessus === "recherche" && (
                         <div className="space-y-6">
-                          {/* Section de recherche */}
+                          {/* Recherche de manifestations existantes */}
                           <Card>
                             <CardHeader className="pb-3">
                               <CardTitle className="text-base flex items-center gap-2">
-                                <Search className="h-4 w-4 text-uh2c-blue" />
+                                <Search className="h-4 w-4" />
                                 Rechercher une manifestation existante
                               </CardTitle>
                               <p className="text-sm text-gray-600">
-                                Recherchez par mot-clé : Ville, Pays, Date de début, Date de fin, Intitulé
+                                Si la manifestation figure déjà dans la liste, vous pouvez la rechercher par mot-clé
                               </p>
                             </CardHeader>
                             <CardContent className="space-y-4">
+                              {/* Barre de recherche principale */}
                               <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                                 <Input
-                                  placeholder="Rechercher par mot-clé..."
-                                  value={searchTerm}
-                                  onChange={(e) => {
-                                    setSearchTerm(e.target.value)
-                                    searchManifestations(e.target.value)
-                                  }}
+                                  placeholder="Rechercher par intitulé, ville ou pays..."
+                                  value={rechercheManifestation}
+                                  onChange={(e) => setRechercheManifestation(e.target.value)}
                                   className="pl-10 h-10"
                                 />
                               </div>
 
-                              {/* Résultats de recherche */}
-                              {isSearching && (
-                                <div className="text-center py-4">
-                                  <div className="inline-flex items-center gap-2 text-sm text-gray-600">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-uh2c-blue"></div>
-                                    Recherche en cours...
-                                  </div>
+                              {/* Filtres avancés */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div>
+                                  <Label className="text-sm font-medium">Ville</Label>
+                                  <Input
+                                    placeholder="Filtrer par ville"
+                                    value={filtreVilleManifestation}
+                                    onChange={(e) => setFiltreVilleManifestation(e.target.value)}
+                                    className="mt-1"
+                                  />
                                 </div>
-                              )}
+                                <div>
+                                  <Label className="text-sm font-medium">Pays</Label>
+                                  <Input
+                                    placeholder="Filtrer par pays"
+                                    value={filtrePaysManifestation}
+                                    onChange={(e) => setFiltrePaysManifestation(e.target.value)}
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium">Date début</Label>
+                                  <Input
+                                    type="date"
+                                    value={filtreDateDebutManifestation}
+                                    onChange={(e) => setFiltreDateDebutManifestation(e.target.value)}
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium">Date fin</Label>
+                                  <Input
+                                    type="date"
+                                    value={filtreDateFinManifestation}
+                                    onChange={(e) => setFiltreDateFinManifestation(e.target.value)}
+                                    className="mt-1"
+                                  />
+                                </div>
+                              </div>
 
-                              {searchResults.length > 0 && (
-                                <div className="space-y-3">
-                                  <h4 className="font-medium text-gray-900">Résultats de recherche :</h4>
-                                  {searchResults.map((manifestation) => (
-                                    <div key={manifestation.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                                      <div className="flex justify-between items-start">
-                                        <div className="flex-1">
-                                          <h5 className="font-semibold text-gray-900 mb-2">{manifestation.intitule}</h5>
-                                          <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                                            <div><strong>Nature:</strong> {manifestation.nature}</div>
-                                            <div><strong>Organisateur:</strong> {manifestation.organisateur}</div>
-                                            <div><strong>Lieu:</strong> {manifestation.ville}, {manifestation.pays}</div>
-                                            <div><strong>Dates:</strong> {new Date(manifestation.dateDebut).toLocaleDateString("fr-FR")} - {new Date(manifestation.dateFin).toLocaleDateString("fr-FR")}</div>
+                              {/* Liste des manifestations filtrées */}
+                              <div className="space-y-3">
+                                <h4 className="font-medium text-sm">Manifestations trouvées ({manifestationsFiltrees.length})</h4>
+                                {manifestationsFiltrees.length > 0 ? (
+                                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                                    {manifestationsFiltrees.map((manifestation) => (
+                                      <div
+                                        key={manifestation.id}
+                                        className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                                        onClick={() => selectionnerManifestation(manifestation)}
+                                      >
+                                        <div className="flex justify-between items-start">
+                                          <div className="flex-1">
+                                            <h5 className="font-medium text-sm">{manifestation.intitule}</h5>
+                                            <div className="flex items-center gap-4 mt-2 text-xs text-gray-600">
+                                              <span className="flex items-center gap-1">
+                                                <MapPin className="h-3 w-3" />
+                                                {manifestation.ville}, {manifestation.pays}
+                                              </span>
+                                              <span className="flex items-center gap-1">
+                                                <Calendar className="h-3 w-3" />
+                                                {new Date(manifestation.dateDebut).toLocaleDateString("fr-FR")} - {new Date(manifestation.dateFin).toLocaleDateString("fr-FR")}
+                                              </span>
+                                            </div>
                                           </div>
-                                          <p className="text-sm text-gray-500 mt-2">{manifestation.description}</p>
+                                          <div className="flex items-center gap-2">
+                                            <Badge variant={manifestation.statut === "Validée" ? "default" : manifestation.statut === "En attente" ? "secondary" : "destructive"}>
+                                              {manifestation.statut}
+                                            </Badge>
+                                            <Button size="sm" variant="outline">
+                                              Sélectionner
+                                            </Button>
+                                          </div>
                                         </div>
-                                        <Button 
-                                          onClick={() => selectManifestation(manifestation)}
-                                          className="ml-4"
-                                        >
-                                          Sélectionner
-                                        </Button>
                                       </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <div className="text-center py-8 text-gray-500">
+                                    <p>Aucune manifestation trouvée</p>
+                                    <p className="text-sm">Essayez de modifier vos critères de recherche</p>
+                                  </div>
+                                )}
+                              </div>
 
-                              {searchTerm && searchResults.length === 0 && !isSearching && (
-                                <div className="text-center py-8 text-gray-500">
-                                  <p>Aucune manifestation trouvée pour "{searchTerm}"</p>
-                                  <p className="text-sm mt-1">Essayez avec d'autres mots-clés ou créez une nouvelle manifestation</p>
+                              {/* Bouton pour créer une nouvelle manifestation */}
+                              <div className="border-t pt-4">
+                                <div className="text-center">
+                                  <p className="text-sm text-gray-600 mb-3">
+                                    La manifestation n'existe pas dans la liste ?
+                                  </p>
+                                  <Button onClick={creerNouvelleManifestation} variant="outline">
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Créer une nouvelle manifestation
+                                  </Button>
                                 </div>
-                              )}
+                              </div>
                             </CardContent>
                           </Card>
-
-                          {/* Bouton pour créer une nouvelle manifestation */}
-                          <div className="text-center">
-                            <Button 
-                              variant="outline" 
-                              onClick={createNewManifestation}
-                              className="w-full"
-                            >
-                              <Plus className="h-4 w-4 mr-2" />
-                              Créer une nouvelle manifestation
-                            </Button>
-                            <p className="text-xs text-gray-500 mt-2">
-                              Si la manifestation n'existe pas, vous pouvez en créer une nouvelle
-                            </p>
-                          </div>
                         </div>
-                      ) : (
+                      )}
+
+                      {/* Étape de sélection d'une manifestation */}
+                      {etapeProcessus === "selection" && manifestationSelectionnee && (
                         <div className="space-y-6">
-                          {/* Bouton retour à la recherche */}
-                          <div className="flex justify-between items-center">
-                            <Button 
-                              variant="outline" 
-                              onClick={backToSearch}
-                              className="flex items-center gap-2"
-                            >
-                              ← Retour à la recherche
-                            </Button>
-                            <div className="text-sm text-gray-600">
-                              Création d'une nouvelle manifestation
-                            </div>
-                          </div>
+                          <Card>
+                            <CardHeader className="pb-3">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <CardTitle className="text-base">Manifestation sélectionnée</CardTitle>
+                                  <p className="text-sm text-gray-600">Confirmez votre participation à cette manifestation</p>
+                                </div>
+                                <Button variant="outline" size="sm" onClick={retourRecherche}>
+                                  <X className="h-4 w-4 mr-2" />
+                                  Changer
+                                </Button>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                              {/* Informations de la manifestation */}
+                              <div className="bg-gray-50 rounded-lg p-4">
+                                <h5 className="font-medium text-sm mb-3">{manifestationSelectionnee.intitule}</h5>
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                  <div>
+                                    <span className="text-gray-600">Nature :</span>
+                                    <span className="ml-2 font-medium">{manifestationSelectionnee.nature}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-600">Lieu :</span>
+                                    <span className="ml-2 font-medium">{manifestationSelectionnee.ville}, {manifestationSelectionnee.pays}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-600">Date début :</span>
+                                    <span className="ml-2 font-medium">{new Date(manifestationSelectionnee.dateDebut).toLocaleDateString("fr-FR")}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-600">Date fin :</span>
+                                    <span className="ml-2 font-medium">{new Date(manifestationSelectionnee.dateFin).toLocaleDateString("fr-FR")}</span>
+                                  </div>
+                                </div>
+                              </div>
 
-                          {/* Formulaire de création de manifestation */}
-                          <form onSubmit={handleSubmitDemandeParticipation} className="space-y-6">
+                              {/* Nature de prise en charge */}
+                              <div>
+                                <Label className="text-sm font-medium">Nature de prise en charge</Label>
+                                <Select
+                                  value={formDataParticipation.naturePriseEnCharge}
+                                  onValueChange={(value: "Frais de séjour" | "Billet d'avion") =>
+                                    setFormDataParticipation((prev) => ({ ...prev, naturePriseEnCharge: value }))
+                                  }
+                                >
+                                  <SelectTrigger className="mt-1">
+                                    <SelectValue placeholder="Sélectionner la nature" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Frais de séjour">Frais de séjour</SelectItem>
+                                    <SelectItem value="Billet d'avion">Billet d'avion</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
 
-                          {/* Section Informations manifestation */}
+                              {/* Justificatif */}
+                              <div>
+                                <Label className="text-sm font-medium">Justificatif de participation <span className="text-red-500">*</span></Label>
+                                <p className="text-xs text-gray-600 mb-2">Joignez un document justifiant votre participation à cette manifestation</p>
+                                {!justificatifParticipation ? (
+                                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 cursor-pointer transition-colors">
+                                    <input
+                                      type="file"
+                                      accept=".pdf,.doc,.docx"
+                                      onChange={(e) => setJustificatifParticipation(e.target.files?.[0] || null)}
+                                      className="hidden"
+                                      id="justificatif-participation"
+                                    />
+                                    <label htmlFor="justificatif-participation" className="cursor-pointer">
+                                      <div className="space-y-3">
+                                        <div className="mx-auto w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                                          <Upload className="h-6 w-6 text-gray-400" />
+                                        </div>
+                                        <div>
+                                          <p className="text-sm font-medium text-gray-700">
+                                            Cliquez pour télécharger un justificatif
+                                          </p>
+                                          <p className="text-xs text-gray-500">
+                                            PDF, DOC, DOCX jusqu'à 10MB
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </label>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                      <Check className="h-4 w-4 text-green-600" />
+                                    </div>
+                                    <div className="flex-1">
+                                      <span className="text-sm text-green-800 font-medium block">
+                                        {justificatifParticipation.name}
+                                      </span>
+                                      <span className="text-xs text-green-600">
+                                        Téléchargé avec succès
+                                      </span>
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => setJustificatifParticipation(null)}
+                                      className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Boutons d'action */}
+                              <div className="flex justify-end space-x-2 pt-4">
+                                <Button type="button" variant="outline" onClick={retourRecherche}>
+                                  Annuler
+                                </Button>
+                                <Button 
+                                  onClick={finaliserParticipation}
+                                  disabled={!justificatifParticipation}
+                                >
+                                  Confirmer la participation
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      )}
+
+                      {/* Étape de création d'une nouvelle manifestation */}
+                      {etapeProcessus === "nouvelle" && (
+                        <div className="space-y-6">
+                          <Card>
+                            <CardHeader className="pb-3">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <CardTitle className="text-base">Créer une nouvelle manifestation</CardTitle>
+                                  <p className="text-sm text-gray-600">Renseignez les informations de la manifestation</p>
+                                </div>
+                                <Button variant="outline" size="sm" onClick={retourRecherche}>
+                                  <X className="h-4 w-4 mr-2" />
+                                  Annuler
+                                </Button>
+                              </div>
+                            </CardHeader>
+                            <CardContent>
+                              <form onSubmit={handleSubmitDemandeParticipation} className="space-y-6">
+
+                                {/* Section Informations manifestation */}
                           <Card>
                             <CardHeader className="pb-2">
                               <CardTitle className="text-base">Informations sur la manifestation</CardTitle>
@@ -541,19 +723,10 @@ export default function ParticipationManifestationMember() {
                                     <SelectValue placeholder="Sélectionner la nature" />
                               </SelectTrigger>
                               <SelectContent>
-                                    {formDataParticipation.fonction === "Enseignant chercheur" ? (
-                                      <>
                                 <SelectItem value="Frais de séjour">Frais de séjour</SelectItem>
-                                        <SelectItem value="Billet d'avion">Billet d'avion</SelectItem>
-                                      </>
-                                    ) : (
-                                      <SelectItem value="Billet d'avion">Billet d'avion</SelectItem>
-                                    )}
+                                <SelectItem value="Billet d'avion">Billet d'avion</SelectItem>
                               </SelectContent>
                             </Select>
-                                {formDataParticipation.fonction !== "Enseignant chercheur" && formDataParticipation.naturePriseEnCharge === "Frais de séjour" && (
-                                  <p className="text-red-500 text-xs mt-1">Les frais de séjour sont uniquement pour les enseignants chercheurs</p>
-                                )}
                         </div>
 
                           <div>
@@ -635,13 +808,26 @@ export default function ParticipationManifestationMember() {
                           
                           <div>
                                 <Label htmlFor="dateManifestation" className="text-xs font-medium text-gray-600">
-                                  Date de déroulement
+                                  Date de début
                                 </Label>
                             <Input
                               id="dateManifestation"                                                                                                                                                                        
                               type="date"
                               value={formDataParticipation.dateManifestation}
                               onChange={(e) => setFormDataParticipation((prev) => ({ ...prev, dateManifestation: e.target.value }))}
+                                  className="mt-1 h-9 text-sm"
+                                />
+                              </div>
+                              
+                              <div>
+                                <Label htmlFor="dateFinManifestation" className="text-xs font-medium text-gray-600">
+                                  Date de fin
+                                </Label>
+                            <Input
+                              id="dateFinManifestation"                                                                                                                                                                        
+                              type="date"
+                              value={formDataParticipation.dateFinManifestation}
+                              onChange={(e) => setFormDataParticipation((prev) => ({ ...prev, dateFinManifestation: e.target.value }))}
                                   className="mt-1 h-9 text-sm"
                                 />
                               </div>
@@ -1143,134 +1329,18 @@ export default function ParticipationManifestationMember() {
 
                           {/* Boutons d'action */}
                           <div className="flex justify-end space-x-2 pt-4">
-                          <Button type="button" variant="outline" onClick={() => setIsModalOpenParticipation(false)}>
-                            Annuler
-                          </Button>
-                          <Button type="submit">Envoyer la demande</Button>
-                        </div>
+                            <Button type="button" variant="outline" onClick={() => setIsModalOpenParticipation(false)}>
+                              Annuler
+                            </Button>
+                            <Button type="submit">Envoyer la demande</Button>
+                          </div>
                       </form>
-                        </div>
-                      )}
-
-                      {/* Interface pour manifestation sélectionnée */}
-                      {selectedManifestation && (
-                        <div className="space-y-6">
-                          <Card className="border-green-200 bg-green-50">
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base flex items-center gap-2 text-green-800">
-                                <Check className="h-4 w-4" />
-                                Manifestation sélectionnée
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                              <div className="bg-white rounded-lg p-4 border border-green-200">
-                                <h5 className="font-semibold text-gray-900 mb-3">{selectedManifestation.intitule}</h5>
-                                <div className="grid grid-cols-2 gap-3 text-sm">
-                                  <div><strong>Nature:</strong> {selectedManifestation.nature}</div>
-                                  <div><strong>Organisateur:</strong> {selectedManifestation.organisateur}</div>
-                                  <div><strong>Lieu:</strong> {selectedManifestation.ville}, {selectedManifestation.pays}</div>
-                                  <div><strong>Dates:</strong> {new Date(selectedManifestation.dateDebut).toLocaleDateString("fr-FR")} - {new Date(selectedManifestation.dateFin).toLocaleDateString("fr-FR")}</div>
-                                </div>
-                              </div>
                             </CardContent>
                           </Card>
-
-                          {/* Formulaire de participation avec justificatif */}
-                          <form onSubmit={handleSubmitDemandeParticipation} className="space-y-6">
-                            {/* Section Documents à fournir */}
-                            <Card className="border-l-4 border-l-uh2c-blue">
-                              <CardHeader className="pb-3 bg-gradient-to-r from-uh2c-blue/5 to-uh2c-blue/10">
-                                <div className="flex items-center space-x-3">
-                                  <div className="w-8 h-8 bg-uh2c-blue/10 rounded-lg flex items-center justify-center">
-                                    <FileText className="h-5 w-5 text-uh2c-blue" />
-                                  </div>
-                                  <div>
-                                    <CardTitle className="text-base font-semibold text-uh2c-blue">Justificatif de participation</CardTitle>
-                                    <p className="text-xs text-uh2c-blue/80 mt-1">Téléchargez le justificatif de votre participation à cette manifestation</p>
-                                  </div>
-                                </div>
-                              </CardHeader>
-                              <CardContent className="p-6">
-                                <div className="bg-white border border-gray-200 rounded-lg p-4">
-                                  <div className="flex items-center space-x-2 mb-3">
-                                    <div className="w-6 h-6 bg-uh2c-blue/10 rounded-full flex items-center justify-center">
-                                      <span className="text-xs font-bold text-uh2c-blue">1</span>
-                                    </div>
-                                    <Label className="text-sm font-semibold text-gray-800">
-                                      Justificatif de participation <span className="text-red-500">*</span>
-                                    </Label>
-                                  </div>
-                                  <p className="text-xs text-gray-600 mb-4 leading-relaxed">
-                                    Lettre d'invitation, programme de la manifestation, ou tout document justifiant votre participation
-                                  </p>
-                                  {!formDataParticipation.documentsFournis.lettreInvitation ? (
-                                    <div className="border-2 border-dashed border-uh2c-blue/20 rounded-lg p-6 text-center hover:border-uh2c-blue/40 hover:bg-uh2c-blue/5 cursor-pointer transition-all">
-                                      <input
-                                        type="file"
-                                        accept=".pdf,.doc,.docx"
-                                        onChange={(e) => handleFileUpload('lettreInvitation', e.target.files?.[0] || null)}
-                                        className="hidden"
-                                        id="justificatif-participation"
-                                      />
-                                      <label htmlFor="justificatif-participation" className="cursor-pointer">
-                                        <div className="space-y-3">
-                                          <div className="mx-auto w-16 h-16 rounded-lg bg-uh2c-blue/10 flex items-center justify-center">
-                                            <FileText className="h-8 w-8 text-uh2c-blue" />
-                                          </div>
-                                          <div>
-                                            <p className="text-sm font-medium text-uh2c-blue">
-                                              Cliquez pour télécharger ou glissez-déposez
-                                            </p>
-                                            <p className="text-xs text-uh2c-blue/70 mt-1">
-                                              PDF, DOC, DOCX jusqu'à 10MB
-                                            </p>
-                                          </div>
-                                        </div>
-                                      </label>
-                                    </div>
-                                  ) : (
-                                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
-                                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                        <Check className="h-4 w-4 text-green-600" />
-                                      </div>
-                                      <div className="flex-1">
-                                        <span className="text-sm text-green-800 font-medium block">
-                                          {formDataParticipation.documentsFournis.lettreInvitation.name}
-                                        </span>
-                                        <span className="text-xs text-green-600">
-                                          Téléchargé avec succès
-                                        </span>
-                                      </div>
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleFileUpload('lettreInvitation', null)}
-                                        className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
-                                      >
-                                        <X className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  )}
-                                </div>
-                              </CardContent>
-                            </Card>
-
-                            {/* Boutons d'action */}
-                            <div className="flex justify-end space-x-2 pt-4">
-                              <Button type="button" variant="outline" onClick={() => {
-                                setIsModalOpenParticipation(false)
-                                setSelectedManifestation(null)
-                                backToSearch()
-                              }}>
-                                Annuler
-                              </Button>
-                              <Button type="submit">Confirmer la participation</Button>
-                            </div>
-                          </form>
-                        </div>
+                      </div>
                       )}
                     </DialogContent>
+                                
                   </Dialog>
                 </div>
             </div>

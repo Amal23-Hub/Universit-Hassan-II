@@ -1,4 +1,4 @@
-const API_URL_MANUAL = "http://localhost:8080/api/publications"; // adapte au besoin
+const API_URL_MANUAL = "http://localhost:8080/api/publications"; 
 
 // Types pour les publications
 export interface Publication {

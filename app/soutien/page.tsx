@@ -1,7 +1,7 @@
-﻿"use client"
+"use client"
 
-import React, { useState } from "react"
-import { useRouter } from "next/navigation"
+import type React from "react"
+import { useState } from "react"
 import { Sidebar } from "@/components/sidebar"
 import { Header } from "@/components/header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { useToast } from "@/hooks/use-toast"
 import { 
   Heart, 
   Calendar, 
@@ -30,8 +31,7 @@ import {
   XCircle,
   Clock,
   ChevronDown,
-  FileText,
-  Building2
+  FileText
 } from "lucide-react"
 import {
   Dialog,
@@ -42,21 +42,29 @@ import {
 } from "@/components/ui/dialog"
 
 export default function SoutienPage() {
-  const router = useRouter()
   const [activeTab, setActiveTab] = useState("manifestation")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [dateFilter, setDateFilter] = useState("")
+  const [typeFilter, setTypeFilter] = useState("all")
+  const [cityFilter, setCityFilter] = useState("all")
+  const [countryFilter, setCountryFilter] = useState("all")
+
+   // Fonction pour gérer le changement de filtre par type
+   const handleTypeFilterChange = (value: string) => {
+     setTypeFilter(value)
+   }
   const [isConferenceFormOpen, setIsConferenceFormOpen] = useState(false)
+  const [isPublicationFormOpen, setIsPublicationFormOpen] = useState(false)
   const [isOuvrageFormOpen, setIsOuvrageFormOpen] = useState(false)
   const [isBrevetFormOpen, setIsBrevetFormOpen] = useState(false)
-  const [isPublicationArticleFormOpen, setIsPublicationArticleFormOpen] = useState(false)
-  const [isRedirectDialogOpen, setIsRedirectDialogOpen] = useState(false)
+  const [isManifestationSupportOpen, setIsManifestationSupportOpen] = useState(false)
   
   // État pour le formulaire de soutien à la conférence
   const [conferenceForm, setConferenceForm] = useState({
-    typeDemande: "laboratoire",
+    typeDemande: "labo",
+    labo: "",
+    universite: "",
     discipline: "",
     natureManifestation: "Congrès",
     naturePriseEnCharge: "Billet d'avion",
@@ -119,25 +127,6 @@ export default function SoutienPage() {
   })
   const [brevetLienJustificatifError, setBrevetLienJustificatifError] = useState("")
 
-  // État pour le formulaire de publication d'article
-  const [publicationArticleForm, setPublicationArticleForm] = useState({
-    titre: "",
-    journal: "",
-    issn: "",
-    base: "",
-    annee: "",
-    lien: "",
-    justificatif: null as File | null
-  })
-  const [publicationArticleErrors, setPublicationArticleErrors] = useState({
-    titre: false,
-    journal: false,
-    issn: false,
-    base: false,
-    annee: false
-  })
-  const [publicationArticleLienJustificatifError, setPublicationArticleLienJustificatifError] = useState("")
-
   // Données d'exemple pour les différents types de soutien
   const soutienData = {
     manifestation: [
@@ -147,7 +136,9 @@ export default function SoutienPage() {
         type: "Manifestation",
         statut: "En attente",
         date: "2024-01-15",
-        montant: "5000 MAD"
+         montant: "5000 MAD",
+         ville: "casablanca",
+         pays: "maroc"
       }
     ],
     conference: [
@@ -157,74 +148,70 @@ export default function SoutienPage() {
         type: "Conférence",
         statut: "Approuvé",
         date: "2024-02-20",
-        montant: "8000 MAD"
+         montant: "8000 MAD",
+         ville: "paris",
+         pays: "france"
       }
     ],
-    "publication-article": [
+    publication: [
       {
-        id: 4,
-        titre: "Publication article revue indexée",
-        type: "Publication d'article",
+        id: 3,
+        titre: "Publication article scientifique",
+        type: "Publication",
         statut: "En cours",
-        date: "2024-01-22",
-        montant: "4000 MAD"
+        date: "2024-01-10",
+         montant: "3000 MAD",
+         ville: "rabat",
+         pays: "maroc"
       }
     ],
     ouvrage: [
       {
-        id: 5,
+        id: 4,
         titre: "Ouvrage de recherche",
         type: "Ouvrage",
         statut: "Rejeté",
         date: "2024-01-05",
-        montant: "10000 MAD"
+         montant: "10000 MAD",
+         ville: "berlin",
+         pays: "allemagne"
       }
     ],
     brevet: [
       {
-        id: 6,
+        id: 5,
         titre: "Enregistrement brevet innovation",
         type: "Brevet",
         statut: "Approuvé",
         date: "2024-01-20",
-        montant: "15000 MAD"
+         montant: "15000 MAD",
+         ville: "montreal",
+         pays: "canada"
       }
     ],
     prime: [
       {
-        id: 7,
+        id: 6,
         titre: "Prime de publication Q1",
         type: "Prime",
         statut: "En attente",
         date: "2024-02-01",
-        montant: "2000 MAD"
+         montant: "2000 MAD",
+         ville: "marrakech",
+         pays: "maroc"
       }
     ]
   }
 
   // Fonction de filtrage des données
-  const getFilteredData = (data: any[]) => {
-    if (!data || !Array.isArray(data)) {
-      return []
-    }
+  const getFilteredData = (data: any[], currentType: string) => {
     return data.filter(item => {
       const matchesSearch = item.titre.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesStatus = statusFilter === "all" || item.statut === statusFilter
-      
-      // Filtre par date
-      let matchesDate = true
-      if (dateFilter && dateFilter !== "") {
-        const itemDate = new Date(item.date)
-        const filterDate = new Date(dateFilter)
-        
-        // Comparer les dates (ignorer l'heure)
-        const itemDateOnly = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate())
-        const filterDateOnly = new Date(filterDate.getFullYear(), filterDate.getMonth(), filterDate.getDate())
-        
-        matchesDate = itemDateOnly.getTime() === filterDateOnly.getTime()
-      }
-      
-      return matchesSearch && matchesStatus && matchesDate
+      const matchesType = typeFilter === "all" || currentType === typeFilter
+      const matchesCity = cityFilter === "all" || item.ville === cityFilter
+      const matchesCountry = countryFilter === "all" || item.pays === countryFilter
+      return matchesSearch && matchesStatus && matchesType && matchesCity && matchesCountry
     })
   }
 
@@ -259,11 +246,11 @@ export default function SoutienPage() {
       color: "bg-green-50 text-green-700 border-green-200"
     },
     {
-      id: "publication-article",
-      title: "Soutien à la publication d'un article",
-      description: "Demande de soutien pour publier des articles dans des revues indexées",
-      icon: FileText,
-      color: "bg-green-50 text-green-700 border-green-200"
+      id: "publication",
+      title: "Soutien à la publication",
+      description: "Demande de soutien pour publier des articles scientifiques",
+      icon: BookOpen,
+      color: "bg-purple-50 text-purple-700 border-purple-200"
     },
     {
       id: "ouvrage",
@@ -286,7 +273,7 @@ export default function SoutienPage() {
       icon: Gift,
       color: "bg-yellow-50 text-yellow-700 border-yellow-200"
     }
-  ]
+  ];
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -295,8 +282,8 @@ export default function SoutienPage() {
         <Header />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4">
           <div className="mx-auto">
-            <div className="mb-4">
-              <div className="flex justify-between items-center mb-3">
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-4">
                 <div>
                   <h1 className="text-lg font-bold text-gray-900">Gestion des Demandes de Soutien</h1>
                   <p className="text-xs text-gray-600 mt-1">Gérez vos demandes de soutien pour vos activités de recherche</p>
@@ -323,7 +310,7 @@ export default function SoutienPage() {
                         className="h-12 text-left justify-start p-4 hover:bg-blue-50 hover:border-blue-300"
                         onClick={() => {
                           setIsDialogOpen(false)
-                          setIsRedirectDialogOpen(true)
+                          setIsManifestationSupportOpen(true)
                         }}
                       >
                         <div className="flex flex-col items-start">
@@ -351,12 +338,12 @@ export default function SoutienPage() {
                         className="h-12 text-left justify-start p-4 hover:bg-blue-50 hover:border-blue-300"
                         onClick={() => {
                           setIsDialogOpen(false)
-                          setIsPublicationArticleFormOpen(true)
+                          setIsPublicationFormOpen(true)
                         }}
                       >
                         <div className="flex flex-col items-start">
-                          <span className="font-medium text-gray-900">Soutien à la publication d'un article</span>
-                          <span className="text-sm text-gray-500">Publier des articles dans des revues indexées</span>
+                          <span className="font-medium text-gray-900">Soutien à la publication</span>
+                          <span className="text-sm text-gray-500">Publier des articles scientifiques</span>
                         </div>
                       </Button>
 
@@ -383,11 +370,10 @@ export default function SoutienPage() {
                         }}
                       >
                         <div className="flex flex-col items-start">
-                          <span className="font-medium text-gray-900">Soutien au brevet</span>
-                          <span className="text-sm text-gray-500">Enregistrer des brevets</span>
+                          <span className="font-medium text-gray-900">Soutien à l'enregistrement au brevet</span>
+                          <span className="text-sm text-gray-500">Garder le même formulaire d'ajout d'un brevet dans le module production scientifique</span>
                         </div>
                       </Button>
-
 
                       <Button
                         variant="outline"
@@ -405,11 +391,8 @@ export default function SoutienPage() {
                     </div>
                   </DialogContent>
                 </Dialog>
-              </div>
-            </div>
 
-
-            {/* Formulaire de soutien à la conférence */}
+                {/* Formulaire de soutien à la conférence */}
                 <Dialog open={isConferenceFormOpen} onOpenChange={setIsConferenceFormOpen}>
                   <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
@@ -421,9 +404,9 @@ export default function SoutienPage() {
                             </div>
                             <div>
                               <DialogTitle className="text-sm font-bold text-uh2c-blue">
-                            DEMANDE DE SOUTIEN À LA CONFÉRENCE
+                                DEMANDE DE SOUTIEN À LA CONFÉRENCE
                               </DialogTitle>
-                              <p className="text-xs text-gray-600 mt-0.5">Remplissez tous les champs obligatoires pour votre demande de soutien</p>
+                               <p className="text-xs text-gray-600 mt-0.5">Remplissez tous les champs obligatoires pour votre demande de soutien à la conférence</p>
                             </div>
                           </div>
                           <Button 
@@ -434,7 +417,7 @@ export default function SoutienPage() {
                               setIsDialogOpen(true)
                             }}
                           >
-                        ← Retour
+                            ← Retour
                           </Button>
                         </div>
                       </div>
@@ -443,18 +426,20 @@ export default function SoutienPage() {
                     <form className="border rounded-lg p-6 mt-4 space-y-6">
                       {/* Type de demande */}
                       <div>
-                     <Label className="text-sm font-medium text-gray-700">Type demande de soutien à la conférence <span className="text-red-500">*</span></Label>
+                        <Label className="text-sm font-medium text-gray-700">
+                          Type demande de soutien à la conférence <span className="text-red-600">*</span>
+                        </Label>
                         <div className="mt-2 space-y-2">
                           <label className="flex items-center space-x-2">
                             <input
                               type="radio"
                               name="typeDemande"
-                              value="laboratoire"
-                              checked={conferenceForm.typeDemande === "laboratoire"}
+                              value="labo"
+                              checked={conferenceForm.typeDemande === "labo"}
                               onChange={(e) => setConferenceForm({...conferenceForm, typeDemande: e.target.value})}
                               className="text-blue-600"
                             />
-                         <span className="text-sm">Laboratoire</span>
+                            <span className="text-sm">Laboratoire</span>
                           </label>
                           <label className="flex items-center space-x-2">
                             <input
@@ -465,7 +450,7 @@ export default function SoutienPage() {
                               onChange={(e) => setConferenceForm({...conferenceForm, typeDemande: e.target.value})}
                               className="text-blue-600"
                             />
-                        <span className="text-sm">Université</span>
+                            <span className="text-sm">Université</span>
                           </label>
                           <label className="flex items-center space-x-2">
                             <input
@@ -476,28 +461,33 @@ export default function SoutienPage() {
                               onChange={(e) => setConferenceForm({...conferenceForm, typeDemande: e.target.value})}
                               className="text-blue-600"
                             />
-                        <span className="text-sm">Fonds propre (projet financé)</span>
+                            <span className="text-sm">Fonds propre (projet financé)</span>
                           </label>
                         </div>
                       </div>
 
                       {/* Discipline */}
                       <div>
-                     <Label htmlFor="discipline" className="text-sm font-medium text-gray-700">Discipline <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="discipline" className="text-sm font-medium text-gray-700">
+                          Discipline <span className="text-red-600">*</span>
+                        </Label>
                         <Input
                           id="discipline"
+                          required
                           value={conferenceForm.discipline}
                           onChange={(e) => setConferenceForm({...conferenceForm, discipline: e.target.value})}
-                      placeholder="Ex: Mathématiques, Informatique, Physique..."
-                          className="mt-1"
+                          placeholder="Ex: Mathématiques, Informatique, Physique..."
+                          className="h-11 rounded-lg text-base mt-1"
                         />
                       </div>
 
                       {/* Nature de la manifestation */}
                       <div>
-                     <Label className="text-sm font-medium text-gray-700">Nature de la manifestation <span className="text-red-500">*</span></Label>
+                        <Label className="text-sm font-medium text-gray-700">
+                          Nature de la manifestation <span className="text-red-600">*</span>
+                        </Label>
                         <div className="mt-2 grid grid-cols-2 gap-2">
-                      {["Congrès", "Conférence", "Séminaire", "Colloque", "Workshop", "Stage"].map((nature) => (
+                          {["Congrès", "Conférence", "Séminaire", "Colloque", "Workshop", "Stage"].map((nature) => (
                             <label key={nature} className="flex items-center space-x-2">
                               <input
                                 type="radio"
@@ -515,18 +505,20 @@ export default function SoutienPage() {
 
                       {/* Nature de prise en charge */}
                       <div>
-                     <Label className="text-sm font-medium text-gray-700">Nature de prise en charge <span className="text-red-500">*</span></Label>
+                        <Label className="text-sm font-medium text-gray-700">
+                          Nature de prise en charge <span className="text-red-600">*</span>
+                        </Label>
                         <div className="mt-2 space-y-2">
                           <label className="flex items-center space-x-2">
                             <input
                               type="radio"
                               name="naturePriseEnCharge"
-                          value="Frais de séjour"
-                          checked={conferenceForm.naturePriseEnCharge === "Frais de séjour"}
+                              value="Frais de séjour"
+                              checked={conferenceForm.naturePriseEnCharge === "Frais de séjour"}
                               onChange={(e) => setConferenceForm({...conferenceForm, naturePriseEnCharge: e.target.value})}
                               className="text-blue-600"
                             />
-                        <span className="text-sm">Frais de séjour (Pour enseignant chercheur uniquement)</span>
+                            <span className="text-sm">Frais de séjour (Pour enseignant chercheur uniquement)</span>
                           </label>
                           <label className="flex items-center space-x-2">
                             <input
@@ -542,52 +534,64 @@ export default function SoutienPage() {
                         </div>
                       </div>
 
-                   {/* Montant estimé */}
+                      {/* Montant estimé */}
                       <div>
-                     <Label htmlFor="montantEstime" className="text-sm font-medium text-gray-700">Montant estimé <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="montantEstime" className="text-sm font-medium text-gray-700">
+                          Montant estimé <span className="text-red-600">*</span>
+                        </Label>
                         <Input
                           id="montantEstime"
                           type="number"
+                          required
                           value={conferenceForm.montantEstime}
                           onChange={(e) => setConferenceForm({...conferenceForm, montantEstime: e.target.value})}
                           placeholder="Montant en MAD"
-                          className="mt-1"
+                          className="h-11 rounded-lg text-base mt-1"
                         />
                       </div>
 
-                   {/* Intitulé de la manifestation */}
+                      {/* Intitulé de la manifestation */}
                       <div>
-                     <Label htmlFor="intituleManifestation" className="text-sm font-medium text-gray-700">Intitulé de la manifestation <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="intituleManifestation" className="text-sm font-medium text-gray-700">
+                          Intitulé de la manifestation <span className="text-red-600">*</span>
+                        </Label>
                         <Input
                           id="intituleManifestation"
+                          required
                           value={conferenceForm.intituleManifestation}
                           onChange={(e) => setConferenceForm({...conferenceForm, intituleManifestation: e.target.value})}
-                      placeholder="Nom de la conférence"
-                          className="mt-1"
+                          placeholder="Nom de la conférence"
+                          className="h-11 rounded-lg text-base mt-1"
                         />
                       </div>
 
                       {/* Lieu de la manifestation */}
                       <div>
-                     <Label htmlFor="lieuManifestation" className="text-sm font-medium text-gray-700">Lieu de la manifestation (Pays-ville) <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="lieuManifestation" className="text-sm font-medium text-gray-700">
+                          Lieu de la manifestation (Pays-ville) <span className="text-red-600">*</span>
+                        </Label>
                         <Input
                           id="lieuManifestation"
+                          required
                           value={conferenceForm.lieuManifestation}
                           onChange={(e) => setConferenceForm({...conferenceForm, lieuManifestation: e.target.value})}
                           placeholder="Ex: France-Paris, Allemagne-Berlin..."
-                          className="mt-1"
+                          className="h-11 rounded-lg text-base mt-1"
                         />
                       </div>
 
-                   {/* Date de déroulement */}
+                      {/* Date de déroulement */}
                       <div>
-                     <Label htmlFor="dateManifestation" className="text-sm font-medium text-gray-700">Date de déroulement de la manifestation <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="dateManifestation" className="text-sm font-medium text-gray-700">
+                          Date de déroulement de la manifestation <span className="text-red-600">*</span>
+                        </Label>
                         <Input
                           id="dateManifestation"
                           type="date"
+                          required
                           value={conferenceForm.dateManifestation}
                           onChange={(e) => setConferenceForm({...conferenceForm, dateManifestation: e.target.value})}
-                          className="mt-1"
+                          className="h-11 rounded-lg text-base mt-1"
                         />
                       </div>
 
@@ -601,10 +605,241 @@ export default function SoutienPage() {
                         </Button>
                       </div>
                     </form>
+
+                    {/* Indication importante */}
+                    <div className="bg-gray-50 border border-gray-200 rounded p-2 mt-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-yellow-600 text-xs font-bold">i</span>
+                        </div>
+                        <p className="text-gray-600 text-xs">
+                          Vous avez le droit de faire une demande de soutien à la conférence une seule fois par an.
+                        </p>
+                      </div>
+                    </div>
                   </DialogContent>
                 </Dialog>
 
-            {/* Formulaire de soutien à l'ouvrage de recherche */}
+                {/* Formulaire de soutien à la publication */}
+                <Dialog open={isPublicationFormOpen} onOpenChange={setIsPublicationFormOpen}>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <div className="bg-gradient-to-r from-uh2c-blue/10 to-uh2c-blue/5 border-l-4 border-uh2c-blue rounded-lg p-3 shadow-sm">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-6 h-6 bg-uh2c-blue/10 rounded-full flex items-center justify-center">
+                              <BookOpen className="h-3 w-3 text-uh2c-blue" />
+                            </div>
+                            <div>
+                              <DialogTitle className="text-sm font-bold text-uh2c-blue">
+                                SOUTIEN À LA PUBLICATION D'UN ARTICLE
+                              </DialogTitle>
+                              <p className="text-xs text-gray-600 mt-0.5">Remplissez tous les champs obligatoires pour votre demande de soutien à la publication</p>
+                            </div>
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              setIsPublicationFormOpen(false)
+                              setIsDialogOpen(true)
+                            }}
+                          >
+                            ← Retour
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogHeader>
+
+                    <form className="border rounded-lg p-6 mt-4 space-y-6">
+                          {/* Titre */}
+                          <div>
+                        <Label htmlFor="title" className="text-sm font-medium text-gray-700">
+                          Titre de la publication <span className="text-red-600">*</span>
+                        </Label>
+                            <Input
+                              id="title"
+                          required
+                              value={publicationForm.title}
+                              onChange={(e) => setPublicationForm({...publicationForm, title: e.target.value})}
+                              placeholder="Titre de l'article ou de la publication"
+                          className="h-11 rounded-lg text-base mt-1"
+                            />
+                          </div>
+
+                          {/* Auteurs */}
+                          <div>
+                        <Label htmlFor="authors" className="text-sm font-medium text-gray-700">
+                          Auteurs <span className="text-red-600">*</span>
+                        </Label>
+                            <Input
+                              id="authors"
+                          required
+                              value={publicationForm.authors}
+                              onChange={(e) => setPublicationForm({...publicationForm, authors: e.target.value})}
+                              placeholder="Noms des auteurs séparés par des virgules"
+                          className="h-11 rounded-lg text-base mt-1"
+                            />
+                          </div>
+
+                          {/* Année */}
+                          <div>
+                        <Label htmlFor="year" className="text-sm font-medium text-gray-700">
+                          Année de publication <span className="text-red-600">*</span>
+                        </Label>
+                            <Input
+                              id="year"
+                              type="number"
+                          required
+                              value={publicationForm.year}
+                              onChange={(e) => setPublicationForm({...publicationForm, year: parseInt(e.target.value)})}
+                          className="h-11 rounded-lg text-base mt-1"
+                              min="1900"
+                              max={new Date().getFullYear()}
+                            />
+                          </div>
+
+                              {/* Journal */}
+                              <div>
+                        <Label htmlFor="journal" className="text-sm font-medium text-gray-700">
+                          Nom de la revue <span className="text-red-600">*</span>
+                        </Label>
+                                <Input
+                                  id="journal"
+                          required
+                                  value={publicationForm.journal}
+                                  onChange={(e) => setPublicationForm({...publicationForm, journal: e.target.value})}
+                                  placeholder="Nom de la revue scientifique"
+                          className="h-11 rounded-lg text-base mt-1"
+                                />
+                              </div>
+
+                              {/* ISSN */}
+                              <div>
+                                <Label htmlFor="issn" className="text-sm font-medium text-gray-700">ISSN</Label>
+                                <Input
+                                  id="issn"
+                                  value={publicationForm.issn}
+                                  onChange={(e) => setPublicationForm({...publicationForm, issn: e.target.value})}
+                                  placeholder="ISSN de la revue"
+                          className="h-11 rounded-lg text-base mt-1"
+                                />
+                              </div>
+
+                              {/* Base d'indexation */}
+                              <div>
+                                <Label htmlFor="base" className="text-sm font-medium text-gray-700">Base d'indexation</Label>
+                                <Select value={publicationForm.base} onValueChange={(value) => setPublicationForm({...publicationForm, base: value})}>
+                          <SelectTrigger className="h-11 rounded-lg text-base mt-1">
+                                    <SelectValue placeholder="Sélectionner la base d'indexation" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Scopus">Scopus</SelectItem>
+                                    <SelectItem value="WOS">Web of Science</SelectItem>
+                                    <SelectItem value="Autre">Autre</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                          {/* Lien */}
+                          <div>
+                        <Label htmlFor="lien" className="text-sm font-medium text-gray-700">
+                          Lien vers la publication <span className="text-red-600">*</span>
+                        </Label>
+                            <Input
+                              id="lien"
+                          required
+                              value={publicationForm.lien}
+                              onChange={(e) => setPublicationForm({...publicationForm, lien: e.target.value})}
+                              placeholder="URL de la publication (DOI, lien vers la revue, etc.)"
+                          className="h-11 rounded-lg text-base mt-1"
+                            />
+                          </div>
+
+                          {/* Justificatif */}
+                          <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          Justificatif <span className="text-red-600">*</span>
+                          <span className='text-xs text-gray-500'> (Scan du justificatif au format PDF)</span>
+                        </Label>
+                        
+                        {!publicationForm.justificatif ? (
+                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 hover:bg-gray-50 cursor-pointer mt-1">
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx"
+                              onChange={(e) => setPublicationForm({...publicationForm, justificatif: e.target.files?.[0] || null})}
+                              className="hidden"
+                              id="justif-publication"
+                            />
+                            <label htmlFor="justif-publication" className="cursor-pointer">
+                              <div className="space-y-3">
+                                <div className="mx-auto w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center">
+                                  <FileText className="h-8 w-8 text-gray-400" />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-gray-600">
+                                    Cliquez pour télécharger ou glissez-déposez
+                                  </p>
+                                  <p className="text-xs text-gray-400 mt-1">
+                                    PDF, DOC, DOCX jusqu'à 10MB
+                                  </p>
+                                </div>
+                              </div>
+                            </label>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-gray-50 mt-1">
+                            <FileText className="h-5 w-5 text-blue-600" />
+                            <span className="flex-1 text-sm text-gray-700 truncate">
+                              {publicationForm.justificatif.name}
+                            </span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setPublicationForm({ ...publicationForm, justificatif: null })
+                                const fileInput = document.getElementById('justif-publication') as HTMLInputElement
+                                if (fileInput) fileInput.value = ''
+                              }}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                            )}
+                          </div>
+
+                          {/* Boutons d'action */}
+                          <div className="flex justify-end space-x-2 pt-4 border-t">
+                            <Button type="button" variant="outline" onClick={() => setIsPublicationFormOpen(false)}>
+                              Annuler
+                            </Button>
+                            <Button type="submit" className="bg-uh2c-blue hover:bg-uh2c-blue/90">
+                              Envoyer la demande
+                            </Button>
+                          </div>
+                        </form>
+
+                    {/* Indication importante */}
+                    <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border-l-4 border-amber-400 rounded-lg p-4 mt-4 shadow-sm">
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-amber-600 text-sm font-bold">ℹ</span>
+                      </div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-amber-900 mb-1">Information importante</h4>
+                          <p className="text-amber-800 text-sm leading-relaxed">
+                            Vous avez le droit de faire une demande de soutien à la publication <span className="font-semibold">une seule fois par an</span>.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+
+                {/* Formulaire de soutien à l'ouvrage de recherche */}
                 <Dialog open={isOuvrageFormOpen} onOpenChange={setIsOuvrageFormOpen}>
                   <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
@@ -616,9 +851,9 @@ export default function SoutienPage() {
                             </div>
                             <div>
                               <DialogTitle className="text-sm font-bold text-uh2c-blue">
-                            SOUTIEN À L'OUVRAGE DE RECHERCHE
+                                SOUTIEN À L'OUVRAGE DE RECHERCHE
                               </DialogTitle>
-                          <p className="text-xs text-gray-600 mt-0.5">Utilisez le même formulaire d'ajout d'un ouvrage dans le module production scientifique</p>
+                              <p className="text-xs text-gray-600 mt-0.5">Remplissez tous les champs obligatoires pour votre demande de soutien à l'ouvrage</p>
                             </div>
                           </div>
                           <Button 
@@ -629,22 +864,22 @@ export default function SoutienPage() {
                               setIsDialogOpen(true)
                             }}
                           >
-                        ← Retour
+                            ← Retour
                           </Button>
                         </div>
                       </div>
                     </DialogHeader>
 
                     <form className="border rounded-lg p-6 mt-4 space-y-6">
-                  {/* Intitulé */}
+                      {/* Intitulé */}
                       <div>
                         <Label htmlFor="intitule-ouvrage" className={`text-sm font-medium ${ouvrageErrors.intitule ? 'text-red-600' : 'text-gray-700'}`}>
-                      Intitulé <span className="text-red-600">*</span>
+                          Intitulé <span className="text-red-600">*</span>
                         </Label>
                         <Input 
                           id="intitule-ouvrage" 
                           required 
-                      placeholder="Intitulé de l'ouvrage" 
+                          placeholder="Intitulé de l'ouvrage" 
                           className={`h-11 rounded-lg text-base mt-1 ${ouvrageErrors.intitule ? 'border-red-500' : ''}`}
                           value={ouvrageForm.intitule}
                           onChange={(e) => {
@@ -655,15 +890,15 @@ export default function SoutienPage() {
                         {ouvrageErrors.intitule && <p className="text-xs text-red-600 mt-1">Ce champ est obligatoire</p>}
                       </div>
 
-                  {/* Maison d'édition */}
+                      {/* Maison d'édition */}
                       <div>
                         <Label htmlFor="maison-edition-ouvrage" className={`text-sm font-medium ${ouvrageErrors.maisonEdition ? 'text-red-600' : 'text-gray-700'}`}>
-                      Maison d'édition <span className="text-red-600">*</span>
+                          Maison d'édition <span className="text-red-600">*</span>
                         </Label>
                         <Input 
                           id="maison-edition-ouvrage" 
                           required 
-                      placeholder="Maison d'édition" 
+                          placeholder="Maison d'édition" 
                           className={`h-11 rounded-lg text-base mt-1 ${ouvrageErrors.maisonEdition ? 'border-red-500' : ''}`}
                           value={ouvrageForm.maisonEdition}
                           onChange={(e) => {
@@ -674,7 +909,7 @@ export default function SoutienPage() {
                         {ouvrageErrors.maisonEdition && <p className="text-xs text-red-600 mt-1">Ce champ est obligatoire</p>}
                       </div>
 
-                  {/* Année */}
+                      {/* Année */}
                       <div>
                         <Label htmlFor="annee-ouvrage" className={`text-sm font-medium ${ouvrageErrors.annee ? 'text-red-600' : 'text-gray-700'}`}>
                           Date <span className="text-red-600">*</span>
@@ -692,7 +927,7 @@ export default function SoutienPage() {
                             if (e.target.value) setOuvrageErrors(err => ({ ...err, annee: false }))
                             const year = parseInt(e.target.value)
                             if (year > new Date().getFullYear()) {
-                          setYearError("L'année ne peut pas être supérieure à l'année actuelle")
+                              setYearError("L'année ne peut pas être supérieure à l'année actuelle")
                             } else {
                               setYearError("")
                             }
@@ -784,10 +1019,10 @@ export default function SoutienPage() {
                                 </div>
                                 <div>
                                   <p className="text-sm font-medium text-gray-600">
-                                Cliquez pour télécharger ou glissez-déposez
+                                    Cliquez pour télécharger ou glissez-déposez
                                   </p>
                                   <p className="text-xs text-gray-400 mt-1">
-                                PDF, DOC, DOCX jusqu'à 10MB
+                                    PDF, DOC, DOCX jusqu'à 10MB
                                   </p>
                                 </div>
                               </div>
@@ -830,10 +1065,22 @@ export default function SoutienPage() {
                         </Button>
                       </div>
                     </form>
+
+                    {/* Indication importante */}
+                    <div className="bg-gray-50 border border-gray-200 rounded p-2 mt-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-yellow-600 text-xs font-bold">i</span>
+                        </div>
+                        <p className="text-gray-600 text-xs">
+                          Vous avez le droit de faire une demande de soutien à l'ouvrage une seule fois par an.
+                        </p>
+                      </div>
+                    </div>
                   </DialogContent>
                 </Dialog>
 
-            {/* Formulaire de soutien à l'enregistrement au brevet */}
+                {/* Formulaire de soutien à l'enregistrement au brevet */}
                 <Dialog open={isBrevetFormOpen} onOpenChange={setIsBrevetFormOpen}>
                   <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
@@ -845,9 +1092,9 @@ export default function SoutienPage() {
                             </div>
                             <div>
                               <DialogTitle className="text-sm font-bold text-uh2c-blue">
-                            SOUTIEN À L'ENREGISTREMENT AU BREVET
+                                SOUTIEN À L'ENREGISTREMENT AU BREVET
                               </DialogTitle>
-                          <p className="text-xs text-gray-600 mt-0.5">Utilisez le même formulaire d'ajout d'un brevet dans le module production scientifique</p>
+                              <p className="text-xs text-gray-600 mt-0.5">Remplissez tous les champs obligatoires pour votre demande de soutien au brevet</p>
                             </div>
                           </div>
                           <Button 
@@ -858,22 +1105,22 @@ export default function SoutienPage() {
                               setIsDialogOpen(true)
                             }}
                           >
-                        ← Retour
+                            ← Retour
                           </Button>
                         </div>
                       </div>
                     </DialogHeader>
 
                     <form className="border rounded-lg p-6 mt-4 space-y-6">
-                  {/* Intitulé */}
+                      {/* Intitulé */}
                       <div>
                         <Label htmlFor="intitule-brevet" className={`text-sm font-medium ${brevetErrors.intitule ? 'text-red-600' : 'text-gray-700'}`}>
-                      Intitulé <span className="text-red-600">*</span>
+                          Intitulé <span className="text-red-600">*</span>
                         </Label>
                         <Input 
                           id="intitule-brevet" 
                           required 
-                      placeholder="Intitulé du brevet" 
+                          placeholder="Intitulé du brevet" 
                           className={`h-11 rounded-lg text-base mt-1 ${brevetErrors.intitule ? 'border-red-500' : ''}`}
                           value={brevetForm.intitule}
                           onChange={(e) => {
@@ -901,9 +1148,9 @@ export default function SoutienPage() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="Brevet d'invention">Brevet d'invention</SelectItem>
-                        <SelectItem value="Modèle d'utilité">Modèle d'utilité</SelectItem>
-                        <SelectItem value="Certificat d'utilité">Certificat d'utilité</SelectItem>
-                        <SelectItem value="Dessin et modèle">Dessin et modèle</SelectItem>
+                            <SelectItem value="Modèle d'utilité">Modèle d'utilité</SelectItem>
+                            <SelectItem value="Certificat d'utilité">Certificat d'utilité</SelectItem>
+                            <SelectItem value="Dessin et modèle">Dessin et modèle</SelectItem>
                             <SelectItem value="Marque">Marque</SelectItem>
                             <SelectItem value="Autre">Autre</SelectItem>
                           </SelectContent>
@@ -930,15 +1177,15 @@ export default function SoutienPage() {
                         {brevetErrors.champApplication && <p className="text-xs text-red-600 mt-1">Ce champ est obligatoire</p>}
                       </div>
 
-                  {/* Numéro de dépôt */}
+                      {/* Numéro de dépôt */}
                       <div>
                         <Label htmlFor="numero-depot-brevet" className={`text-sm font-medium ${brevetErrors.numeroDepot ? 'text-red-600' : 'text-gray-700'}`}>
-                      Numéro de dépôt <span className="text-red-600">*</span>
+                          Numéro de dépôt <span className="text-red-600">*</span>
                         </Label>
                         <Input 
                           id="numero-depot-brevet" 
                           required 
-                      placeholder="Numéro de dépôt" 
+                          placeholder="Numéro de dépôt" 
                           className={`h-11 rounded-lg text-base mt-1 ${brevetErrors.numeroDepot ? 'border-red-500' : ''}`}
                           value={brevetForm.numeroDepot}
                           onChange={(e) => {
@@ -949,10 +1196,10 @@ export default function SoutienPage() {
                         {brevetErrors.numeroDepot && <p className="text-xs text-red-600 mt-1">Ce champ est obligatoire</p>}
                       </div>
 
-                  {/* Date de dépôt */}
+                      {/* Date de dépôt */}
                       <div>
                         <Label htmlFor="date-depot-brevet" className={`text-sm font-medium ${brevetErrors.dateDepot ? 'text-red-600' : 'text-gray-700'}`}>
-                      Date de dépôt <span className="text-red-600">*</span>
+                          Date de dépôt <span className="text-red-600">*</span>
                         </Label>
                         <Input 
                           id="date-depot-brevet" 
@@ -968,12 +1215,12 @@ export default function SoutienPage() {
                         {brevetErrors.dateDepot && <p className="text-xs text-red-600 mt-1">Ce champ est obligatoire</p>}
                       </div>
 
-                  {/* Numéro d'enregistrement */}
+                      {/* Numéro d'enregistrement */}
                       <div>
-                    <Label htmlFor="numero-enregistrement-brevet" className="text-sm font-medium text-gray-700">Numéro d'enregistrement</Label>
+                        <Label htmlFor="numero-enregistrement-brevet" className="text-sm font-medium text-gray-700">Numéro d'enregistrement</Label>
                         <Input 
                           id="numero-enregistrement-brevet" 
-                      placeholder="Numéro d'enregistrement" 
+                          placeholder="Numéro d'enregistrement" 
                           className="h-11 rounded-lg text-base mt-1"
                           value={brevetForm.numeroEnregistrement}
                           onChange={(e) => setBrevetForm({ ...brevetForm, numeroEnregistrement: e.target.value })}
@@ -1049,10 +1296,10 @@ export default function SoutienPage() {
                                 </div>
                                 <div>
                                   <p className="text-sm font-medium text-gray-600">
-                                Cliquez pour télécharger ou glissez-déposez
+                                    Cliquez pour télécharger ou glissez-déposez
                                   </p>
                                   <p className="text-xs text-gray-400 mt-1">
-                                PDF, DOC, DOCX jusqu'à 10MB
+                                    PDF, DOC, DOCX jusqu'à 10MB
                                   </p>
                                 </div>
                               </div>
@@ -1095,476 +1342,309 @@ export default function SoutienPage() {
                         </Button>
                       </div>
                     </form>
+
+                    {/* Indication importante */}
+                    <div className="bg-gray-50 border border-gray-200 rounded p-2 mt-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-yellow-600 text-xs font-bold">i</span>
+                        </div>
+                        <p className="text-gray-600 text-xs">
+                          Vous avez le droit de faire une demande de soutien au brevet une seule fois par an.
+                        </p>
+                      </div>
+                    </div>
                   </DialogContent>
                 </Dialog>
 
-            {/* Formulaire Soutien à la publication d'un article */}
-            <Dialog open={isPublicationArticleFormOpen} onOpenChange={setIsPublicationArticleFormOpen}>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <div className="bg-gradient-to-r from-uh2c-blue/10 to-uh2c-blue/5 border-l-4 border-uh2c-blue rounded-lg p-3 shadow-sm">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-uh2c-blue rounded-lg flex items-center justify-center">
-                          <FileText className="h-4 w-4 text-white" />
+                {/* Popup pour le soutien à la manifestation */}
+                <Dialog open={isManifestationSupportOpen} onOpenChange={setIsManifestationSupportOpen}>
+                  <DialogContent className="max-w-lg">
+                    <DialogHeader>
+                      <div className="bg-gradient-to-r from-uh2c-blue/10 to-uh2c-blue/5 border-l-4 border-uh2c-blue rounded-lg p-3 mb-3 shadow-sm">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-uh2c-blue/20 rounded-full flex items-center justify-center">
+                            <Calendar className="h-4 w-4 text-uh2c-blue" />
               </div>
-                        <div>
-                          <h2 className="text-lg font-semibold text-gray-900">Soutien à la publication d'un article</h2>
-                          <p className="text-sm text-gray-600">Remplissez tous les champs obligatoires pour votre demande de soutien</p>
+                          <DialogTitle className="text-uh2c-blue font-bold text-base">Soutien à la Manifestation</DialogTitle>
             </div>
                       </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          setIsPublicationArticleFormOpen(false)
-                          setIsDialogOpen(true)
-                        }}
-                      >
-                        ← Retour
-                      </Button>
-                    </div>
-                  </div>
-                </DialogHeader>
-
-                <form className="border rounded-lg p-6 mt-4 space-y-6">
-                  {/* Titre de la publication */}
-                  <div>
-                    <Label htmlFor="titre-publication">
-                      Intitulé de la publication <span className="text-red-600">*</span>
-                    </Label>
-                      <Input
-                      id="titre-publication" 
-                      required 
-                      placeholder="Titre de la publication" 
-                      className={`h-11 rounded-lg text-base ${publicationArticleErrors.titre ? 'border-red-500' : ''}`}
-                      value={publicationArticleForm.titre}
-                      onChange={(e) => {
-                        setPublicationArticleForm(v => ({ ...v, titre: e.target.value }))
-                        if (e.target.value) setPublicationArticleErrors(err => ({ ...err, titre: false }))
-                      }}
-                    />
-                    {publicationArticleErrors.titre && <p className="text-xs text-red-600 mt-1">Ce champ est obligatoire</p>}
-                    </div>
-
-                  {/* Libellé de la Revue/Journal */}
-                  <div>
-                    <Label htmlFor="journal-publication">
-                      Libellé de la Revue/Journal <span className="text-red-600">*</span>
-                    </Label>
-                    <Input 
-                      id="journal-publication" 
-                      required 
-                      placeholder="Nom de la revue/journal" 
-                      className={`h-11 rounded-lg text-base ${publicationArticleErrors.journal ? 'border-red-500' : ''}`}
-                      value={publicationArticleForm.journal}
-                      onChange={(e) => {
-                        setPublicationArticleForm(v => ({ ...v, journal: e.target.value }))
-                        if (e.target.value) setPublicationArticleErrors(err => ({ ...err, journal: false }))
-                      }}
-                    />
-                    {publicationArticleErrors.journal && <p className="text-xs text-red-600 mt-1">Ce champ est obligatoire</p>}
-                  </div>
-
-                  {/* ISSN */}
-                  <div>
-                    <Label htmlFor="issn-publication">
-                      ISSN de la Revue/Journal <span className="text-red-600">*</span>
-                    </Label>
-                    <Input 
-                      id="issn-publication" 
-                      required 
-                      placeholder="ISSN" 
-                      className={`h-11 rounded-lg text-base ${publicationArticleErrors.issn ? 'border-red-500' : ''}`}
-                      value={publicationArticleForm.issn}
-                      onChange={(e) => {
-                        setPublicationArticleForm(v => ({ ...v, issn: e.target.value }))
-                        if (e.target.value) setPublicationArticleErrors(err => ({ ...err, issn: false }))
-                      }}
-                    />
-                    {publicationArticleErrors.issn && <p className="text-xs text-red-600 mt-1">Ce champ est obligatoire</p>}
-                  </div>
-
-                  {/* Base d'indexation */}
-                  <div>
-                    <Label htmlFor="base-publication">
-                      Base d'indexation <span className="text-red-600">*</span>
-                    </Label>
-                    <Select
-                      value={publicationArticleForm.base}
-                      onValueChange={(value) => {
-                        setPublicationArticleForm(v => ({ ...v, base: value }))
-                        if (value) setPublicationArticleErrors(err => ({ ...err, base: false }))
-                      }}
-                    >
-                      <SelectTrigger className={`h-11 rounded-lg text-base ${publicationArticleErrors.base ? 'border-red-500' : ''}`}>
-                        <SelectValue placeholder="Choisir une base d'indexation" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Scopus">Scopus</SelectItem>
-                        <SelectItem value="WOS">WOS</SelectItem>
-                        <SelectItem value="ORCID">ORCID</SelectItem>
-                        <SelectItem value="DOI">DOI</SelectItem>
-                        <SelectItem value="DOAJ">DOAJ</SelectItem>
-                        <SelectItem value="Autre">Autre</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {publicationArticleErrors.base && <p className="text-xs text-red-600 mt-1">Ce champ est obligatoire</p>}
-                  </div>
-
-                  {/* Date de publication */}
-                  <div>
-                    <Label htmlFor="annee-publication">
-                      Date de publication <span className="text-red-600">*</span>
-                    </Label>
-                    <Input
-                      id="annee-publication"
-                      type="number"
-                      required
-                      placeholder="2024"
-                      className={`h-11 rounded-lg text-base ${publicationArticleErrors.annee ? 'border-red-500' : ''}`}
-                      value={publicationArticleForm.annee}
-                      onChange={(e) => {
-                        setPublicationArticleForm(v => ({ ...v, annee: e.target.value }))
-                        if (e.target.value) setPublicationArticleErrors(err => ({ ...err, annee: false }))
-                      }}
-                    />
-                    {publicationArticleErrors.annee && <p className="text-xs text-red-600 mt-1">Ce champ est obligatoire</p>}
-                  </div>
-
-                  {/* Lien vers la revue */}
-                  <div>
-                    <Label htmlFor="lien-publication">
-                      Lien vers la revue
-                      <span className={`ml-1 ${!publicationArticleForm.lien && !publicationArticleForm.justificatif ? 'text-red-600' : 'text-gray-500'}`}>
-                        {!publicationArticleForm.lien && !publicationArticleForm.justificatif ? '*' : (!publicationArticleForm.lien ? '(optionnel)' : '')}
-                      </span>
-                    </Label>
-                    <Input 
-                      id="lien-publication" 
-                      placeholder="https://ieeexplore.ieee.org/document/1234567" 
-                      className="h-11 rounded-lg text-base"
-                      value={publicationArticleForm.lien}
-                      onChange={(e) => {
-                        setPublicationArticleForm({ ...publicationArticleForm, lien: e.target.value })
-                        if (e.target.value || publicationArticleForm.justificatif) {
-                          setPublicationArticleLienJustificatifError("")
-                        }
-                      }}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Fournissez un lien OU un justificatif (au moins l'un des deux est requis)
-                    </p>
-                  </div>
-
-                  {/* Justificatif */}
-                  <div>
-                    <Label htmlFor="justif-publication">
-                      Justificatif 
-                      <span className={`ml-1 ${!publicationArticleForm.lien && !publicationArticleForm.justificatif ? 'text-red-600' : 'text-gray-500'}`}>
-                        {!publicationArticleForm.lien && !publicationArticleForm.justificatif ? '*' : (!publicationArticleForm.justificatif ? '(optionnel)' : '')}
-                      </span>
-                      <span className='text-xs text-gray-500'> (Scan du justificatif au format PDF)</span>
-                    </Label>
+                    </DialogHeader>
                     
-                    {!publicationArticleForm.justificatif ? (
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 hover:bg-gray-50 cursor-pointer">
-                        <input
-                          type="file"
-                          accept=".pdf,.doc,.docx"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0] || null
-                            setPublicationArticleForm({ ...publicationArticleForm, justificatif: file })
-                            if (file || publicationArticleForm.lien) {
-                              setPublicationArticleLienJustificatifError("")
-                            }
-                          }}
-                          className="hidden"
-                          id="justif-publication"
-                        />
-                        <label htmlFor="justif-publication" className="cursor-pointer">
-                          <div className="space-y-3">
-                            <div className="mx-auto w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center">
-                              <FileText className="h-8 w-8 text-gray-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-600">
-                                Cliquez pour télécharger ou glissez-déposez
-                              </p>
-                              <p className="text-xs text-gray-400 mt-1">
-                                PDF, DOC, DOCX jusqu'à 10MB
-                              </p>
-                            </div>
-                          </div>
-                        </label>
+                    <div className="space-y-4">
+                      <div className="text-center py-3">
+                        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <MessageSquare className="h-8 w-8 text-blue-600" />
+                        </div>
+                        <p className="text-gray-700 text-sm leading-relaxed">
+                          Veuillez vous diriger vers les manifestations scientifiques de soutien afin d'effectuer votre demande de soutien à la Manifestation
+                        </p>
                       </div>
-                    ) : (
-                      <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <FileText className="h-5 w-5 text-gray-400" />
-                            <div>
-                              <p className="text-sm font-medium text-gray-900">{publicationArticleForm.justificatif.name}</p>
-                              <p className="text-xs text-gray-500">
-                                {(publicationArticleForm.justificatif.size / 1024 / 1024).toFixed(2)} MB
-                              </p>
-                            </div>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
+                      
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <span>Redirection vers la section manifestations scientifiques</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between space-x-3 pt-2">
+                        <div className="flex space-x-2">
+                          <Button 
+                            variant="outline" 
                             size="sm"
-                            onClick={() => setPublicationArticleForm({ ...publicationArticleForm, justificatif: null })}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => {
+                              setIsManifestationSupportOpen(false)
+                              setIsDialogOpen(true)
+                            }}
                           >
-                            <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                            ← Retour
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setIsManifestationSupportOpen(false)}
+                          >
+                            Annuler
+                          </Button>
+                        </div>
+                        <Button 
+                          size="sm"
+                          className="bg-uh2c-blue hover:bg-uh2c-blue/90"
+                          onClick={() => {
+                            setIsManifestationSupportOpen(false)
+                            // Redirection vers la page d'organisation de manifestation
+                            window.location.href = '/manifestations-scientifiques/organisation-manifestation-member'
+                          }}
+                        >
+                          Aller aux manifestations scientifiques
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+
+            {/* Section Recherche et filtres */}
+            <Card className="mb-4 bg-blue-50">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Search className="h-3 w-3 text-uh2c-blue" />
+                  <CardTitle className="text-sm">Recherche et filtres</CardTitle>
                 </div>
-                    )}
-                    {publicationArticleLienJustificatifError && (
-                      <p className="text-xs text-red-600 mt-1">{publicationArticleLienJustificatifError}</p>
-                    )}
-                  </div>
-
-                  {/* Boutons d'action */}
-                  <div className="flex justify-end space-x-2 pt-4 border-t">
-                    <Button type="button" variant="outline" onClick={() => setIsPublicationArticleFormOpen(false)}>
-                      Annuler
-                    </Button>
-                    <Button type="submit" className="bg-uh2c-blue hover:bg-uh2c-blue/90">
-                      Envoyer la demande
-                    </Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
-
-            {/* Nouveau design avec grille de cartes */}
-            <div className="space-y-4">
-
-              {/* Filtres avancés */}
-              <div className="bg-blue-50 border border-gray-300 rounded-lg p-3 mb-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Search className="h-3 w-3 text-gray-700" />
-                  <h3 className="text-sm font-bold text-black">Filtres de recherche</h3>
-                </div>
-                
-                <div className="space-y-3">
-                  {/* Champ de recherche principal */}
-                  <div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {/* Barre de recherche principale */}
                     <div className="relative">
-                      <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500 w-3 h-3" />
+                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3" />
                       <Input
-                        placeholder="Rechercher une demande..."
+                    placeholder="Rechercher une demande de soutien..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-8 h-8 text-xs bg-white border-gray-300 rounded-md"
+                    className="pl-6 h-7 text-xs"
                       />
                     </div>
+
+                {/* Filtres par type et date */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1">
+                      <Filter className="h-3 w-3 text-gray-500" />
+                      <Label className="text-xs font-medium">Type de soutien</Label>
                   </div>
-
-                  {/* Filtres en trois colonnes */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div>
-                      <div className="flex items-center gap-1 mb-1">
-                        <FileText className="h-3 w-3 text-gray-600" />
-                        <Label className="text-xs font-medium text-gray-700">Type de soutien</Label>
-                      </div>
-                      <Select value={activeTab} onValueChange={setActiveTab}>
-                        <SelectTrigger className="h-8 text-xs bg-white border-gray-300 rounded-md">
-                          <SelectValue placeholder="Tous les types" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Tous les types</SelectItem>
-                          {soutienTypes.map(type => (
-                            <SelectItem key={type.id} value={type.id}>{type.title}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <div className="flex items-center gap-1 mb-1">
-                        <CheckCircle className="h-3 w-3 text-gray-600" />
-                        <Label className="text-xs font-medium text-gray-700">Statut</Label>
-                      </div>
-                      <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="h-8 text-xs bg-white border-gray-300 rounded-md">
-                          <SelectValue placeholder="Tous les statuts" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Tous les statuts</SelectItem>
-                          <SelectItem value="En attente">En attente</SelectItem>
-                          <SelectItem value="Approuvé">Approuvé</SelectItem>
-                          <SelectItem value="Rejeté">Rejeté</SelectItem>
-                          <SelectItem value="En cours">En cours</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <div className="flex items-center gap-1 mb-1">
-                        <Calendar className="h-3 w-3 text-gray-600" />
-                        <Label className="text-xs font-medium text-gray-700">Date</Label>
-                      </div>
-                      <div className="space-y-2">
-                        <Input
-                          type="date"
-                          value={dateFilter}
-                          onChange={(e) => setDateFilter(e.target.value)}
-                          className="h-8 text-xs bg-white border-gray-300 rounded-md"
-                          placeholder="Date de début"
-                        />
-                      </div>
-                    </div>
+                    <Select value={typeFilter} onValueChange={handleTypeFilterChange}>
+                      <SelectTrigger className="h-7 text-xs">
+                        <SelectValue placeholder="Tous les types" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Tous les types</SelectItem>
+                        <SelectItem value="manifestation">Soutien à la manifestation</SelectItem>
+                        <SelectItem value="conference">Soutien à la conférence</SelectItem>
+                        <SelectItem value="publication">Soutien à la publication</SelectItem>
+                        <SelectItem value="ouvrage">Soutien à l'ouvrage</SelectItem>
+                        <SelectItem value="brevet">Soutien au brevet</SelectItem>
+                        <SelectItem value="prime">Prime de publication</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3 text-gray-500" />
+                      <Label className="text-xs font-medium">Date</Label>
+                </div>
+                    <Input
+                      type="date"
+                      className="h-7 text-xs"
+                      onChange={(e) => {
+                        // Vous pouvez ajouter la logique de filtrage par date ici
+                        console.log('Date sélectionnée:', e.target.value)
+                      }}
+                    />
                   </div>
                 </div>
-              </div>
 
-              {/* Section principale */}
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
-                 <div className="mb-4">
-                     <h2 className="text-lg font-semibold text-gray-900">Mes demandes de soutien</h2>
-                     <p className="text-sm text-gray-600">Gérez toutes vos demandes de soutien en un seul endroit</p>
-                 </div>
+                {/* Filtres par pays et ville */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1">
+                      <Filter className="h-3 w-3 text-gray-500" />
+                      <Label className="text-xs font-medium">Pays</Label>
+                    </div>
+                    <Select value={countryFilter} onValueChange={setCountryFilter}>
+                      <SelectTrigger className="h-7 text-xs">
+                        <SelectValue placeholder="Tous les pays" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Tous les pays</SelectItem>
+                        <SelectItem value="maroc">Maroc</SelectItem>
+                        <SelectItem value="france">France</SelectItem>
+                        <SelectItem value="allemagne">Allemagne</SelectItem>
+                        <SelectItem value="canada">Canada</SelectItem>
+                        <SelectItem value="espagne">Espagne</SelectItem>
+                        <SelectItem value="italie">Italie</SelectItem>
+                        <SelectItem value="suisse">Suisse</SelectItem>
+                        <SelectItem value="belgique">Belgique</SelectItem>
+                        <SelectItem value="etats-unis">États-Unis</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1">
+                      <Filter className="h-3 w-3 text-gray-500" />
+                      <Label className="text-xs font-medium">Ville</Label>
+                    </div>
+                    <Select value={cityFilter} onValueChange={setCityFilter}>
+                      <SelectTrigger className="h-7 text-xs">
+                        <SelectValue placeholder="Toutes les villes" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Toutes les villes</SelectItem>
+                        <SelectItem value="casablanca">Casablanca</SelectItem>
+                        <SelectItem value="rabat">Rabat</SelectItem>
+                        <SelectItem value="marrakech">Marrakech</SelectItem>
+                        <SelectItem value="paris">Paris</SelectItem>
+                        <SelectItem value="lyon">Lyon</SelectItem>
+                        <SelectItem value="berlin">Berlin</SelectItem>
+                        <SelectItem value="munich">Munich</SelectItem>
+                        <SelectItem value="montreal">Montréal</SelectItem>
+                        <SelectItem value="toronto">Toronto</SelectItem>
+                        <SelectItem value="madrid">Madrid</SelectItem>
+                        <SelectItem value="barcelone">Barcelone</SelectItem>
+                        <SelectItem value="rome">Rome</SelectItem>
+                        <SelectItem value="milan">Milan</SelectItem>
+                        <SelectItem value="zurich">Zurich</SelectItem>
+                        <SelectItem value="geneve">Genève</SelectItem>
+                        <SelectItem value="bruxelles">Bruxelles</SelectItem>
+                        <SelectItem value="new-york">New York</SelectItem>
+                        <SelectItem value="los-angeles">Los Angeles</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
 
-                {/* Liste des demandes */}
-                <div className="space-y-3">
-                      {(() => {
-                    let allData: any[] = []
-                    if (activeTab === "all") {
-                      soutienTypes.forEach(type => {
-                        const data = soutienData[type.id as keyof typeof soutienData] || []
-                        allData = [...allData, ...data.map(item => ({ ...item, type: type.title, typeId: type.id, typeColor: type.color, typeIcon: type.icon }))]
-                      })
-                    } else {
-                      const type = soutienTypes.find(t => t.id === activeTab)
-                      if (type) {
-                        const data = soutienData[type.id as keyof typeof soutienData] || []
-                        allData = data.map(item => ({ ...item, type: type.title, typeId: type.id, typeColor: type.color, typeIcon: type.icon }))
-                      }
-                    }
-                    
-                    const filteredData = getFilteredData(allData)
-                    
-                        return filteredData.length > 0 ? (
-                      filteredData.map((item) => (
-                        <div key={`${item.typeId}-${item.id}`} className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors border-l-4 border-blue-900">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="text-base font-semibold text-gray-900">{item.titre}</h3>
-                                  <Badge variant="outline" className="text-xs">{item.type}</Badge>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-gray-600">
-                                  <div className="flex items-center gap-1">
-                                    <Calendar className="h-3 w-3 text-gray-400" />
-                                    <span>{new Date(item.date).toLocaleDateString("fr-FR")}</span>
+              </CardContent>
+            </Card>
+
+             {/* Affichage des demandes de soutien */}
+             <div className="mt-6">
+               {(() => {
+                 // Collecter toutes les données selon le filtre
+                 let allItems: any[] = []
+                 
+                 if (typeFilter === "all") {
+                   // Récupérer tous les éléments de tous les types
+                   soutienTypes.forEach(type => {
+                     const typeData = soutienData[type.id as keyof typeof soutienData]
+                     const filteredData = getFilteredData(typeData, type.id)
+                     filteredData.forEach(item => {
+                       allItems.push({ ...item, typeId: type.id, typeTitle: type.title })
+                     })
+                   })
+                 } else {
+                   // Récupérer les éléments du type sélectionné
+                   const typeData = soutienData[typeFilter as keyof typeof soutienData]
+                   const filteredData = getFilteredData(typeData, typeFilter)
+                   const selectedType = soutienTypes.find(type => type.id === typeFilter)
+                   filteredData.forEach(item => {
+                     allItems.push({ ...item, typeId: typeFilter, typeTitle: selectedType?.title })
+                   })
+                 }
+                 
+                 if (allItems.length === 0) {
+                   return (
+                  <Card>
+                       <CardContent className="text-center py-8">
+                         <p className="text-gray-500 mb-2">Aucune demande de soutien trouvée</p>
+                         <p className="text-sm text-gray-400">Cliquez sur "Nouvelle demande" pour commencer</p>
+                       </CardContent>
+                     </Card>
+                   )
+                 }
+                 
+                 return (
+                   <Card>
+                     <CardHeader className="pb-2">
+                        <div>
+                         <CardTitle className="text-lg">
+                           {typeFilter === "all" 
+                             ? "Toutes les demandes de soutien" 
+                             : soutienTypes.find(type => type.id === typeFilter)?.title || "Demandes de soutien"
+                           }
+                         </CardTitle>
+                         <p className="text-sm text-gray-600 mt-1">
+                           {typeFilter === "all" 
+                             ? "Liste de toutes vos demandes de soutien" 
+                             : soutienTypes.find(type => type.id === typeFilter)?.description || ""
+                           }
+                         </p>
+                      </div>
+                    </CardHeader>
+                     <CardContent className="pt-2 px-4 pb-4">
+                       <div className="space-y-3">
+                         {allItems.map((item) => (
+                           <div key={`${item.typeId}-${item.id}`} className="bg-gray-50 border-l-4 border-l-blue-900 border border-gray-200 rounded-lg hover:shadow-lg hover:bg-gray-100 transition-all duration-200 p-3">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex-1">
+                                 <div className="flex items-center gap-2 mb-1">
+                                   <h3 className="font-medium text-gray-900 text-sm">{item.titre}</h3>
+                                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{item.typeTitle}</span>
+                                 </div>
+                                 <div className="flex items-center gap-4 text-gray-600 text-xs">
+                                      <span>Date: {new Date(item.date).toLocaleDateString("fr-FR")}</span>
+                                      <span>Montant: {item.montant}</span>
+                                   <span>Lieu: {item.ville && item.pays ? `${item.ville}, ${item.pays}` : 'Non spécifié'}</span>
+                                    </div>
                                   </div>
-                                  <div className="flex items-center gap-1">
-                                    <Gift className="h-3 w-3 text-gray-400" />
-                                    <span className="font-semibold text-uh2c-blue">{item.montant}</span>
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                    <Clock className="h-3 w-3 text-gray-400" />
-                                    <span>{item.type}</span>
-                                  </div>
-                                </div>
-                            </div>
                                   <div className="flex items-center gap-3">
                                     {getStatutBadge(item.statut)}
                                     <div className="flex gap-1">
-                                <Button variant="ghost" size="sm" className="hover:bg-blue-50 hover:text-blue-600">
+                                      <Button variant="ghost" size="sm">
                                         <Eye className="h-4 w-4" />
                                       </Button>
-                                <Button variant="ghost" size="sm" className="hover:bg-green-50 hover:text-green-600">
+                                      <Button variant="ghost" size="sm">
                                         <Edit className="h-4 w-4" />
                                       </Button>
-                                <Button variant="ghost" size="sm" className="hover:bg-red-50 hover:text-red-600">
+                                      <Button variant="ghost" size="sm">
                                         <Trash2 className="h-4 w-4" />
                                       </Button>
                                     </div>
                                   </div>
                                 </div>
                               </div>
-                      ))
-                    ) : (
-                      <div className="text-center py-12">
-                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <FileText className="h-8 w-8 text-gray-400" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Aucune demande trouvée</h3>
-                        <p className="text-gray-500 mb-4">
-                          {activeTab === "all" 
-                            ? "Vous n'avez pas encore de demandes de soutien" 
-                            : `Vous n'avez pas encore de demandes de ${soutienTypes.find(t => t.id === activeTab)?.title.toLowerCase()}`
-                          }
-                        </p>
-                        <Button 
-                          onClick={() => setIsDialogOpen(true)}
-                          className="bg-uh2c-blue hover:bg-uh2c-blue/90"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Créer une nouvelle demande
-                        </Button>
+                            ))}
                           </div>
-                        )
-                      })()}
-                </div>
-              </div>
-            </div>
+                    </CardContent>
+                  </Card>
+                 )
+               })()}
+             </div>
           </div>
         </main>
       </div>
-
-      {/* Popup de redirection pour manifestations scientifiques */}
-            <Dialog open={isRedirectDialogOpen} onOpenChange={setIsRedirectDialogOpen}>
-              <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-uh2c-blue/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Calendar className="h-8 w-8 text-uh2c-blue" />
-              </div>
-              <DialogTitle className="text-xl font-semibold text-gray-900 mb-3">
-                Redirection vers les Manifestations
-              </DialogTitle>
-              <p className="text-gray-600 text-base">
-                Veuillez vous rediriger vers les manifestations scientifiques afin d'effectuer une demande de soutien à la manifestation.
-              </p>
-            </div>
-          </DialogHeader>
-          
-          <div className="flex justify-center gap-4 pt-8">
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setIsRedirectDialogOpen(false)
-                setIsDialogOpen(true)
-              }}
-              className="px-6 py-3 border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-colors"
-            >
-              ← Retour
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => setIsRedirectDialogOpen(false)}
-              className="px-6 py-3 border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-colors"
-            >
-              Annuler
-            </Button>
-            <Button 
-              className="bg-uh2c-blue hover:bg-uh2c-blue/90 px-6 py-3 text-white font-medium transition-colors"
-              onClick={() => {
-                setIsRedirectDialogOpen(false)
-                router.push('/manifestations-scientifiques/organisation-manifestation-member')
-              }}
-            >
-              Aller aux Manifestations
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
+
