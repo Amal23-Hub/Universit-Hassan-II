@@ -405,16 +405,23 @@ export default function ParticipationManifestationMember() {
                         <div className="space-y-4">
                           {/* Recherche de manifestations existantes */}
                           <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base flex items-center gap-2">
-                                <Search className="h-4 w-4" />
-                                Rechercher une manifestation
-                              </CardTitle>
-                              <p className="text-sm text-gray-600">
-                                Tapez le nom, la ville ou le pays de la manifestation
-                              </p>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
+                             <CardHeader className="pb-2 bg-gradient-to-r from-uh2c-blue/10 to-uh2c-blue/5">
+                               <div className="text-center py-1">
+                                 <div className="inline-flex items-center gap-1.5 mb-1.5">
+                                   <div className="w-5 h-5 bg-uh2c-blue/20 rounded-full flex items-center justify-center">
+                                     <Search className="h-2.5 w-2.5 text-uh2c-blue" />
+                                   </div>
+                                   <h2 className="text-base font-semibold text-gray-800">
+                                     Rechercher une manifestation
+                                   </h2>
+                                 </div>
+                                 <div className="w-12 h-0.5 bg-uh2c-blue mx-auto mb-1.5 rounded-full"></div>
+                                 <p className="text-xs text-gray-600 max-w-xs mx-auto mb-2">
+                                   Tapez le nom, la ville ou le pays de la manifestation
+                                 </p>
+                               </div>
+                             </CardHeader>
+                             <CardContent className="space-y-3 pt-2">
                               {/* Barre de recherche principale */}
                               <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -541,11 +548,20 @@ export default function ParticipationManifestationMember() {
                       {etapeProcessus === "selection" && manifestationSelectionnee && (
                         <div className="space-y-4">
                           <Card>
-                            <CardHeader className="pb-3">
+                            <CardHeader className="pb-2">
                               <div className="flex items-center justify-between">
-                                <div>
-                                  <CardTitle className="text-base">Manifestation sélectionnée</CardTitle>
-                                  <p className="text-sm text-gray-600">Confirmez votre participation à cette manifestation</p>
+                                <div className="flex items-center gap-2">
+                                  <div className="p-1.5 bg-green-100 rounded-lg">
+                                    <Check className="h-4 w-4 text-green-600" />
+                                  </div>
+                                  <div>
+                                    <h2 className="text-base font-semibold text-gray-900">
+                                      Manifestation sélectionnée
+                                    </h2>
+                                    <p className="text-xs text-gray-600 mt-0.5">
+                                      Confirmez votre participation à cette manifestation
+                                    </p>
+                                  </div>
                                 </div>
                                 <Button variant="outline" size="sm" onClick={retourRecherche}>
                                   <X className="h-4 w-4 mr-2" />
@@ -597,9 +613,21 @@ export default function ParticipationManifestationMember() {
                               </div>
 
                               {/* Justificatif */}
-                              <div>
-                                <Label className="text-sm font-medium">Justificatif de participation <span className="text-red-500">*</span></Label>
-                                <p className="text-xs text-gray-600 mb-2">Joignez un document justifiant votre participation à cette manifestation</p>
+                              <div className="bg-gradient-to-r from-uh2c-blue/10 to-uh2c-blue/5 rounded-lg p-3 mb-3">
+                                <div className="text-center py-1">
+                                  <div className="inline-flex items-center gap-1.5 mb-1.5">
+                                    <div className="w-5 h-5 bg-uh2c-blue/20 rounded-full flex items-center justify-center">
+                                      <FileText className="h-2.5 w-2.5 text-uh2c-blue" />
+                                    </div>
+                                    <h3 className="text-base font-semibold text-gray-800">
+                                      Justificatif de participation <span className="text-red-500">*</span>
+                                    </h3>
+                                  </div>
+                                  <div className="w-12 h-0.5 bg-uh2c-blue mx-auto mb-1.5 rounded-full"></div>
+                                  <p className="text-xs text-gray-600 max-w-xs mx-auto mb-2">
+                                    Joignez un document justifiant votre participation à cette manifestation
+                                  </p>
+                                </div>
                                 {!justificatifParticipation ? (
                                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 cursor-pointer transition-colors">
                                     <input
@@ -672,11 +700,20 @@ export default function ParticipationManifestationMember() {
                       {etapeProcessus === "nouvelle" && (
                         <div className="space-y-4">
                           <Card>
-                            <CardHeader className="pb-3">
+                            <CardHeader className="pb-2">
                               <div className="flex items-center justify-between">
-                                <div>
-                                  <CardTitle className="text-base">Créer une nouvelle manifestation</CardTitle>
-                                  <p className="text-sm text-gray-600">Renseignez les informations de la manifestation</p>
+                                <div className="flex items-center gap-2">
+                                  <div className="p-1.5 bg-uh2c-blue/10 rounded-lg">
+                                    <Plus className="h-4 w-4 text-uh2c-blue" />
+                                  </div>
+                                  <div>
+                                    <h2 className="text-base font-semibold text-gray-900">
+                                      Créer une nouvelle manifestation
+                                    </h2>
+                                    <p className="text-xs text-gray-600 mt-0.5">
+                                      Renseignez les informations de la manifestation
+                                    </p>
+                                  </div>
                                 </div>
                                 <Button variant="outline" size="sm" onClick={retourRecherche}>
                                   <ArrowLeft className="h-4 w-4 mr-2" />
@@ -1348,6 +1385,7 @@ export default function ParticipationManifestationMember() {
                           </Card>
                       </div>
                       )}
+
                     </DialogContent>
                                 
                   </Dialog>

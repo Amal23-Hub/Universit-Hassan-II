@@ -1361,38 +1361,42 @@ export default function SoutienPage() {
                 <Dialog open={isManifestationSupportOpen} onOpenChange={setIsManifestationSupportOpen}>
                   <DialogContent className="max-w-lg">
                     <DialogHeader>
-                      <div className="bg-gradient-to-r from-uh2c-blue/10 to-uh2c-blue/5 border-l-4 border-uh2c-blue rounded-lg p-3 mb-3 shadow-sm">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-uh2c-blue/20 rounded-full flex items-center justify-center">
-                            <Calendar className="h-4 w-4 text-uh2c-blue" />
-              </div>
-                          <DialogTitle className="text-uh2c-blue font-bold text-base">Soutien à la Manifestation</DialogTitle>
-            </div>
+                      <div className="bg-gradient-to-r from-uh2c-blue/10 to-uh2c-blue/5 border-l-4 border-uh2c-blue rounded-lg p-2 mb-2 shadow-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-uh2c-blue/20 rounded-full flex items-center justify-center">
+                            <Calendar className="h-3 w-3 text-uh2c-blue" />
+                          </div>
+                          <div>
+                            <DialogTitle className="text-uh2c-blue font-bold text-sm">Soutien à la Manifestation</DialogTitle>
+                            <p className="text-xs text-gray-600 mt-0.5">Demande de soutien pour organiser des manifestations scientifiques</p>
+                          </div>
+                        </div>
                       </div>
                     </DialogHeader>
                     
-                    <div className="space-y-4">
-                      <div className="text-center py-3">
-                        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <MessageSquare className="h-8 w-8 text-blue-600" />
+                    <div className="space-y-3">
+                      <div className="text-center py-2">
+                        <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                          <MessageSquare className="h-6 w-6 text-blue-600" />
                         </div>
-                        <p className="text-gray-700 text-sm leading-relaxed">
+                        <p className="text-gray-700 text-xs leading-relaxed">
                           Veuillez vous diriger vers les manifestations scientifiques de soutien afin d'effectuer votre demande de soutien à la Manifestation
                         </p>
                       </div>
                       
-                      <div className="bg-gray-50 rounded-lg p-3">
+                      <div className="bg-gray-50 rounded-lg p-2">
                         <div className="flex items-center gap-2 text-xs text-gray-600">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
                           <span>Redirection vers la section manifestations scientifiques</span>
                         </div>
                       </div>
                       
-                      <div className="flex justify-between space-x-3 pt-2">
-                        <div className="flex space-x-2">
+                      <div className="flex justify-between space-x-2 pt-1">
+                        <div className="flex space-x-1">
                           <Button 
                             variant="outline" 
                             size="sm"
+                            className="text-xs px-2 py-1"
                             onClick={() => {
                               setIsManifestationSupportOpen(false)
                               setIsDialogOpen(true)
@@ -1403,6 +1407,7 @@ export default function SoutienPage() {
                           <Button 
                             variant="outline" 
                             size="sm"
+                            className="text-xs px-2 py-1"
                             onClick={() => setIsManifestationSupportOpen(false)}
                           >
                             Annuler
@@ -1410,7 +1415,7 @@ export default function SoutienPage() {
                         </div>
                         <Button 
                           size="sm"
-                          className="bg-uh2c-blue hover:bg-uh2c-blue/90"
+                          className="bg-uh2c-blue hover:bg-uh2c-blue/90 text-xs px-2 py-1"
                           onClick={() => {
                             setIsManifestationSupportOpen(false)
                             // Redirection vers la page d'organisation de manifestation
