@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, Filter, Eye, Edit, Trash2, Upload, ExternalLink, FileText, Check, Calendar, X, Users, MapPin } from "lucide-react"
+import { Plus, Search, Filter, Eye, Edit, Trash2, Upload, ExternalLink, FileText, Check, Calendar, X, Users, MapPin, ArrowLeft } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 import { paysMonde, getVillesByPays } from "@/lib/pays-villes"
@@ -376,21 +376,21 @@ export default function ParticipationManifestationMember() {
                       Demander une participation à une manifestation
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+                  <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                       <DialogTitle className="sr-only">
                         Processus de Participation à une manifestation
                       </DialogTitle>
                       
                       {/* En-tête unifié du formulaire */}
-                      <div className="mb-4">
-                        <div className="bg-gradient-to-r from-uh2c-blue/5 to-uh2c-blue/10 border-l-4 border-uh2c-blue rounded-lg p-3 shadow-sm">
+                      <div className="mb-3">
+                        <div className="bg-gradient-to-r from-uh2c-blue/5 to-uh2c-blue/10 border-l-4 border-uh2c-blue rounded-lg p-2 shadow-sm">
                           <div className="flex items-center space-x-3">
                             <div className="w-6 h-6 bg-uh2c-blue/10 rounded-full flex items-center justify-center">
                               <Users className="h-3 w-3 text-uh2c-blue" />
                             </div>
                             <div>
                               <h2 className="text-sm font-bold text-uh2c-blue">
-                                PROCESSUS DE PARTICIPATION À UNE MANIFESTATION
+                                Demander une participation à une manifestation
                               </h2>
                               <p className="text-xs text-gray-600 mt-0.5">
                                 Recherchez une manifestation existante ou créez-en une nouvelle
@@ -402,122 +402,131 @@ export default function ParticipationManifestationMember() {
 
                       {/* Étapes du processus */}
                       {etapeProcessus === "recherche" && (
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                           {/* Recherche de manifestations existantes */}
                           <Card>
                             <CardHeader className="pb-3">
                               <CardTitle className="text-base flex items-center gap-2">
                                 <Search className="h-4 w-4" />
-                                Rechercher une manifestation existante
+                                Rechercher une manifestation
                               </CardTitle>
                               <p className="text-sm text-gray-600">
-                                Si la manifestation figure déjà dans la liste, vous pouvez la rechercher par mot-clé
+                                Tapez le nom, la ville ou le pays de la manifestation
                               </p>
                             </CardHeader>
-                            <CardContent className="space-y-4">
+                            <CardContent className="space-y-3">
                               {/* Barre de recherche principale */}
                               <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                                 <Input
-                                  placeholder="Rechercher par intitulé, ville ou pays..."
+                                  placeholder="Nom, ville ou pays de la manifestation..."
                                   value={rechercheManifestation}
                                   onChange={(e) => setRechercheManifestation(e.target.value)}
-                                  className="pl-10 h-10"
+                                  className="pl-10 h-9"
                                 />
                               </div>
 
-                              {/* Filtres avancés */}
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div>
-                                  <Label className="text-sm font-medium">Ville</Label>
-                                  <Input
-                                    placeholder="Filtrer par ville"
-                                    value={filtreVilleManifestation}
-                                    onChange={(e) => setFiltreVilleManifestation(e.target.value)}
-                                    className="mt-1"
-                                  />
+                              {/* Filtres simplifiés - seulement si recherche active */}
+                              {(rechercheManifestation || filtreVilleManifestation || filtrePaysManifestation || filtreDateDebutManifestation || filtreDateFinManifestation) && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-gray-100">
+                                  <div>
+                                    <Label className="text-xs font-medium text-gray-600">Ville</Label>
+                                    <Input
+                                      placeholder="Ville"
+                                      value={filtreVilleManifestation}
+                                      onChange={(e) => setFiltreVilleManifestation(e.target.value)}
+                                      className="mt-1 h-8 text-sm"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label className="text-xs font-medium text-gray-600">Pays</Label>
+                                    <Input
+                                      placeholder="Pays"
+                                      value={filtrePaysManifestation}
+                                      onChange={(e) => setFiltrePaysManifestation(e.target.value)}
+                                      className="mt-1 h-8 text-sm"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label className="text-xs font-medium text-gray-600">Date début</Label>
+                                    <Input
+                                      type="date"
+                                      value={filtreDateDebutManifestation}
+                                      onChange={(e) => setFiltreDateDebutManifestation(e.target.value)}
+                                      className="mt-1 h-8 text-sm"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label className="text-xs font-medium text-gray-600">Date fin</Label>
+                                    <Input
+                                      type="date"
+                                      value={filtreDateFinManifestation}
+                                      onChange={(e) => setFiltreDateFinManifestation(e.target.value)}
+                                      className="mt-1 h-8 text-sm"
+                                    />
+                                  </div>
                                 </div>
-                                <div>
-                                  <Label className="text-sm font-medium">Pays</Label>
-                                  <Input
-                                    placeholder="Filtrer par pays"
-                                    value={filtrePaysManifestation}
-                                    onChange={(e) => setFiltrePaysManifestation(e.target.value)}
-                                    className="mt-1"
-                                  />
-                                </div>
-                                <div>
-                                  <Label className="text-sm font-medium">Date début</Label>
-                                  <Input
-                                    type="date"
-                                    value={filtreDateDebutManifestation}
-                                    onChange={(e) => setFiltreDateDebutManifestation(e.target.value)}
-                                    className="mt-1"
-                                  />
-                                </div>
-                                <div>
-                                  <Label className="text-sm font-medium">Date fin</Label>
-                                  <Input
-                                    type="date"
-                                    value={filtreDateFinManifestation}
-                                    onChange={(e) => setFiltreDateFinManifestation(e.target.value)}
-                                    className="mt-1"
-                                  />
-                                </div>
-                              </div>
+                              )}
 
                               {/* Liste des manifestations filtrées */}
-                              <div className="space-y-3">
-                                <h4 className="font-medium text-sm">Manifestations trouvées ({manifestationsFiltrees.length})</h4>
-                                {manifestationsFiltrees.length > 0 ? (
-                                  <div className="space-y-2 max-h-60 overflow-y-auto">
-                                    {manifestationsFiltrees.map((manifestation) => (
-                                      <div
-                                        key={manifestation.id}
-                                        className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
-                                        onClick={() => selectionnerManifestation(manifestation)}
-                                      >
-                                        <div className="flex justify-between items-start">
-                                          <div className="flex-1">
-                                            <h5 className="font-medium text-sm">{manifestation.intitule}</h5>
-                                            <div className="flex items-center gap-4 mt-2 text-xs text-gray-600">
-                                              <span className="flex items-center gap-1">
-                                                <MapPin className="h-3 w-3" />
-                                                {manifestation.ville}, {manifestation.pays}
-                                              </span>
-                                              <span className="flex items-center gap-1">
-                                                <Calendar className="h-3 w-3" />
-                                                {new Date(manifestation.dateDebut).toLocaleDateString("fr-FR")} - {new Date(manifestation.dateFin).toLocaleDateString("fr-FR")}
-                                              </span>
+                              {(rechercheManifestation || filtreVilleManifestation || filtrePaysManifestation || filtreDateDebutManifestation || filtreDateFinManifestation) && (
+                                <div className="space-y-2">
+                                  <h4 className="font-medium text-sm">Manifestations trouvées ({manifestationsFiltrees.length})</h4>
+                                  {manifestationsFiltrees.length > 0 ? (
+                                    <div className="space-y-1 max-h-48 overflow-y-auto">
+                                      {manifestationsFiltrees.map((manifestation) => (
+                                        <div
+                                          key={manifestation.id}
+                                          className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                                          onClick={() => selectionnerManifestation(manifestation)}
+                                        >
+                                          <div className="flex justify-between items-start">
+                                            <div className="flex-1">
+                                              <h5 className="font-medium text-sm">{manifestation.intitule}</h5>
+                                              <div className="flex items-center gap-4 mt-2 text-xs text-gray-600">
+                                                <span className="flex items-center gap-1">
+                                                  <MapPin className="h-3 w-3" />
+                                                  {manifestation.ville}, {manifestation.pays}
+                                                </span>
+                                                <span className="flex items-center gap-1">
+                                                  <Calendar className="h-3 w-3" />
+                                                  {new Date(manifestation.dateDebut).toLocaleDateString("fr-FR")} - {new Date(manifestation.dateFin).toLocaleDateString("fr-FR")}
+                                                </span>
+                                              </div>
                                             </div>
-                                          </div>
                                           <div className="flex items-center gap-2">
                                             <Badge variant={manifestation.statut === "Validée" ? "default" : manifestation.statut === "En attente" ? "secondary" : "destructive"}>
                                               {manifestation.statut}
                                             </Badge>
-                                            <Button size="sm" variant="outline">
+                                            <Button 
+                                              size="sm" 
+                                              variant="outline"
+                                              className="text-xs px-2 py-1 h-6"
+                                              onClick={() => selectionnerManifestation(manifestation)}
+                                            >
                                               Sélectionner
                                             </Button>
                                           </div>
+                                          </div>
                                         </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                ) : (
-                                  <div className="text-center py-8 text-gray-500">
-                                    <p>Aucune manifestation trouvée</p>
-                                    <p className="text-sm">Essayez de modifier vos critères de recherche</p>
-                                  </div>
-                                )}
-                              </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <div className="text-center py-8 text-gray-500">
+                                      <p>Aucune manifestation trouvée</p>
+                                      <p className="text-sm">Essayez de modifier vos critères de recherche</p>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
 
                               {/* Bouton pour créer une nouvelle manifestation */}
-                              <div className="border-t pt-4">
+                              <div className="border-t pt-3">
                                 <div className="text-center">
-                                  <p className="text-sm text-gray-600 mb-3">
+                                  <p className="text-sm text-gray-600 mb-2">
                                     La manifestation n'existe pas dans la liste ?
                                   </p>
-                                  <Button onClick={creerNouvelleManifestation} variant="outline">
+                                  <Button onClick={creerNouvelleManifestation} variant="outline" size="sm">
                                     <Plus className="h-4 w-4 mr-2" />
                                     Créer une nouvelle manifestation
                                   </Button>
@@ -530,7 +539,7 @@ export default function ParticipationManifestationMember() {
 
                       {/* Étape de sélection d'une manifestation */}
                       {etapeProcessus === "selection" && manifestationSelectionnee && (
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                           <Card>
                             <CardHeader className="pb-3">
                               <div className="flex items-center justify-between">
@@ -661,7 +670,7 @@ export default function ParticipationManifestationMember() {
 
                       {/* Étape de création d'une nouvelle manifestation */}
                       {etapeProcessus === "nouvelle" && (
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                           <Card>
                             <CardHeader className="pb-3">
                               <div className="flex items-center justify-between">
@@ -670,13 +679,13 @@ export default function ParticipationManifestationMember() {
                                   <p className="text-sm text-gray-600">Renseignez les informations de la manifestation</p>
                                 </div>
                                 <Button variant="outline" size="sm" onClick={retourRecherche}>
-                                  <X className="h-4 w-4 mr-2" />
-                                  Annuler
+                                  <ArrowLeft className="h-4 w-4 mr-2" />
+                                  Retour
                                 </Button>
                               </div>
                             </CardHeader>
                             <CardContent>
-                              <form onSubmit={handleSubmitDemandeParticipation} className="space-y-6">
+                              <form onSubmit={handleSubmitDemandeParticipation} className="space-y-4">
 
                                 {/* Section Informations manifestation */}
                           <Card>
@@ -926,35 +935,35 @@ export default function ParticipationManifestationMember() {
                           </Card>
 
                           {/* Section DOSSIER À FOURNIR */}
-                          <Card className="border-l-4 border-l-uh2c-blue">
-                            <CardHeader className="pb-3 bg-gradient-to-r from-uh2c-blue/5 to-uh2c-blue/10">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 bg-uh2c-blue/10 rounded-lg flex items-center justify-center">
-                                  <FileText className="h-5 w-5 text-uh2c-blue" />
+                          <Card className="mt-1">
+                            <CardHeader className="pt-2 pb-1 bg-gradient-to-r from-uh2c-blue/5 to-uh2c-blue/10">
+                              <div className="flex items-center space-x-2">
+                                <div className="w-5 h-5 bg-uh2c-blue/10 rounded-lg flex items-center justify-center">
+                                  <FileText className="h-3 w-3 text-uh2c-blue" />
                                 </div>
                                 <div>
-                                  <CardTitle className="text-base font-semibold text-uh2c-blue">Dossier à fournir</CardTitle>
-                                  <p className="text-xs text-uh2c-blue/80 mt-1">Téléchargez les documents requis pour votre demande</p>
+                                  <CardTitle className="text-sm font-semibold text-uh2c-blue">Dossier à fournir</CardTitle>
+                                  <p className="text-xs text-uh2c-blue/80">Documents requis pour votre demande</p>
                                 </div>
                               </div>
                             </CardHeader>
-                            <CardContent className="p-6">
-                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <CardContent className="pt-2 px-3 pb-3">
+                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                 {/* Demande officielle */}
-                                <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                                  <div className="flex items-center space-x-2 mb-3">
-                                    <div className="w-6 h-6 bg-uh2c-blue/10 rounded-full flex items-center justify-center">
+                                <div className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow">
+                                  <div className="flex items-center space-x-2 mb-2">
+                                    <div className="w-5 h-5 bg-uh2c-blue/10 rounded-full flex items-center justify-center">
                                       <span className="text-xs font-bold text-uh2c-blue">1</span>
                                     </div>
                                     <Label className="text-sm font-semibold text-gray-800">
                                       Demande officielle <span className="text-red-500">*</span>
                                     </Label>
                                   </div>
-                                  <p className="text-xs text-gray-600 mb-4 leading-relaxed">
+                                  <p className="text-xs text-gray-600 mb-3 leading-relaxed">
                                     Portant le numéro téléphone et l'adresse e-mail S/C du Chef d'établissement, adressée au Président de l'Université
                                   </p>
                                   {!formDataParticipation.documentsFournis.demandeOfficielle ? (
-                                    <div className="border-2 border-dashed border-uh2c-blue/20 rounded-lg p-6 text-center hover:border-uh2c-blue/40 hover:bg-uh2c-blue/5 cursor-pointer transition-all">
+                                    <div className="border-2 border-dashed border-uh2c-blue/20 rounded-lg p-4 text-center hover:border-uh2c-blue/40 hover:bg-uh2c-blue/5 cursor-pointer transition-all">
                                       <input
                                         type="file"
                                         accept=".pdf,.doc,.docx"
@@ -963,9 +972,9 @@ export default function ParticipationManifestationMember() {
                                         id="demande-officielle"
                                       />
                                       <label htmlFor="demande-officielle" className="cursor-pointer">
-                                        <div className="space-y-3">
-                                          <div className="mx-auto w-16 h-16 rounded-lg bg-uh2c-blue/10 flex items-center justify-center">
-                                            <FileText className="h-8 w-8 text-uh2c-blue" />
+                                        <div className="space-y-2">
+                                          <div className="mx-auto w-12 h-12 rounded-lg bg-uh2c-blue/10 flex items-center justify-center">
+                                            <FileText className="h-6 w-6 text-uh2c-blue" />
                                           </div>
                                           <div>
                                             <p className="text-sm font-medium text-uh2c-blue">
@@ -1006,8 +1015,8 @@ export default function ParticipationManifestationMember() {
 
                                 {/* Lettre d'invitation */}
                                 <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                                  <div className="flex items-center space-x-2 mb-3">
-                                    <div className="w-6 h-6 bg-uh2c-blue/10 rounded-full flex items-center justify-center">
+                                  <div className="flex items-center space-x-2 mb-2">
+                                    <div className="w-5 h-5 bg-uh2c-blue/10 rounded-full flex items-center justify-center">
                                       <span className="text-xs font-bold text-uh2c-blue">2</span>
                                     </div>
                                     <Label className="text-sm font-semibold text-gray-800">
@@ -1018,7 +1027,7 @@ export default function ParticipationManifestationMember() {
                                     Une copie de la lettre officielle d'invitation ou d'acceptation de participation à la manifestation
                                   </p>
                                   {!formDataParticipation.documentsFournis.lettreInvitation ? (
-                                    <div className="border-2 border-dashed border-uh2c-blue/20 rounded-lg p-6 text-center hover:border-uh2c-blue/40 hover:bg-uh2c-blue/5 cursor-pointer transition-all">
+                                    <div className="border-2 border-dashed border-uh2c-blue/20 rounded-lg p-4 text-center hover:border-uh2c-blue/40 hover:bg-uh2c-blue/5 cursor-pointer transition-all">
                                       <input
                                         type="file"
                                         accept=".pdf,.doc,.docx"
@@ -1027,9 +1036,9 @@ export default function ParticipationManifestationMember() {
                                         id="lettre-invitation"
                                       />
                                       <label htmlFor="lettre-invitation" className="cursor-pointer">
-                                        <div className="space-y-3">
-                                          <div className="mx-auto w-16 h-16 rounded-lg bg-uh2c-blue/10 flex items-center justify-center">
-                                            <FileText className="h-8 w-8 text-uh2c-blue" />
+                                        <div className="space-y-2">
+                                          <div className="mx-auto w-12 h-12 rounded-lg bg-uh2c-blue/10 flex items-center justify-center">
+                                            <FileText className="h-6 w-6 text-uh2c-blue" />
                                           </div>
                                           <div>
                                             <p className="text-sm font-medium text-uh2c-blue">
@@ -1082,7 +1091,7 @@ export default function ParticipationManifestationMember() {
                                     Le programme de la manifestation scientifique
                                   </p>
                                   {!formDataParticipation.documentsFournis.programmeManifestation ? (
-                                    <div className="border-2 border-dashed border-uh2c-blue/20 rounded-lg p-6 text-center hover:border-uh2c-blue/40 hover:bg-uh2c-blue/5 cursor-pointer transition-all">
+                                    <div className="border-2 border-dashed border-uh2c-blue/20 rounded-lg p-4 text-center hover:border-uh2c-blue/40 hover:bg-uh2c-blue/5 cursor-pointer transition-all">
                                       <input
                                         type="file"
                                         accept=".pdf,.doc,.docx"
@@ -1091,9 +1100,9 @@ export default function ParticipationManifestationMember() {
                                         id="programme-manifestation"
                                       />
                                       <label htmlFor="programme-manifestation" className="cursor-pointer">
-                                        <div className="space-y-3">
-                                          <div className="mx-auto w-16 h-16 rounded-lg bg-uh2c-blue/10 flex items-center justify-center">
-                                            <FileText className="h-8 w-8 text-uh2c-blue" />
+                                        <div className="space-y-2">
+                                          <div className="mx-auto w-12 h-12 rounded-lg bg-uh2c-blue/10 flex items-center justify-center">
+                                            <FileText className="h-6 w-6 text-uh2c-blue" />
                                           </div>
                                           <div>
                                             <p className="text-sm font-medium text-uh2c-blue">
@@ -1146,7 +1155,7 @@ export default function ParticipationManifestationMember() {
                                     Résumé de la communication présentée à la manifestation scientifique
                                   </p>
                                   {!formDataParticipation.documentsFournis.resumeCommunication ? (
-                                    <div className="border-2 border-dashed border-uh2c-blue/20 rounded-lg p-6 text-center hover:border-uh2c-blue/40 hover:bg-uh2c-blue/5 cursor-pointer transition-all">
+                                    <div className="border-2 border-dashed border-uh2c-blue/20 rounded-lg p-4 text-center hover:border-uh2c-blue/40 hover:bg-uh2c-blue/5 cursor-pointer transition-all">
                                       <input
                                         type="file"
                                         accept=".pdf,.doc,.docx"
@@ -1155,9 +1164,9 @@ export default function ParticipationManifestationMember() {
                                         id="resume-communication"
                                       />
                                       <label htmlFor="resume-communication" className="cursor-pointer">
-                                        <div className="space-y-3">
-                                          <div className="mx-auto w-16 h-16 rounded-lg bg-uh2c-blue/10 flex items-center justify-center">
-                                            <FileText className="h-8 w-8 text-uh2c-blue" />
+                                        <div className="space-y-2">
+                                          <div className="mx-auto w-12 h-12 rounded-lg bg-uh2c-blue/10 flex items-center justify-center">
+                                            <FileText className="h-6 w-6 text-uh2c-blue" />
                                           </div>
                                           <div>
                                             <p className="text-sm font-medium text-uh2c-blue">
@@ -1210,7 +1219,7 @@ export default function ParticipationManifestationMember() {
                                     Formulaire de demande de mobilité dûment renseigné et signé (formulaire disponible sur le site de l'Université)
                                   </p>
                                   {!formDataParticipation.documentsFournis.formulaireMobilite ? (
-                                    <div className="border-2 border-dashed border-uh2c-blue/20 rounded-lg p-6 text-center hover:border-uh2c-blue/40 hover:bg-uh2c-blue/5 cursor-pointer transition-all">
+                                    <div className="border-2 border-dashed border-uh2c-blue/20 rounded-lg p-4 text-center hover:border-uh2c-blue/40 hover:bg-uh2c-blue/5 cursor-pointer transition-all">
                                       <input
                                         type="file"
                                         accept=".pdf,.doc,.docx"
@@ -1219,9 +1228,9 @@ export default function ParticipationManifestationMember() {
                                         id="formulaire-mobilite"
                                       />
                                       <label htmlFor="formulaire-mobilite" className="cursor-pointer">
-                                        <div className="space-y-3">
-                                          <div className="mx-auto w-16 h-16 rounded-lg bg-uh2c-blue/10 flex items-center justify-center">
-                                            <FileText className="h-8 w-8 text-uh2c-blue" />
+                                        <div className="space-y-2">
+                                          <div className="mx-auto w-12 h-12 rounded-lg bg-uh2c-blue/10 flex items-center justify-center">
+                                            <FileText className="h-6 w-6 text-uh2c-blue" />
                                           </div>
                                           <div>
                                             <p className="text-sm font-medium text-uh2c-blue">
@@ -1274,7 +1283,7 @@ export default function ParticipationManifestationMember() {
                                     Copie carte d'étudiant ou attestation d'inscription (pour les doctorants)
                                   </p>
                                   {!formDataParticipation.documentsFournis.copieCarteEtudiant ? (
-                                    <div className="border-2 border-dashed border-uh2c-blue/20 rounded-lg p-6 text-center hover:border-uh2c-blue/40 hover:bg-uh2c-blue/5 cursor-pointer transition-all">
+                                    <div className="border-2 border-dashed border-uh2c-blue/20 rounded-lg p-4 text-center hover:border-uh2c-blue/40 hover:bg-uh2c-blue/5 cursor-pointer transition-all">
                                       <input
                                         type="file"
                                         accept=".pdf,.jpg,.jpeg,.png"
@@ -1283,9 +1292,9 @@ export default function ParticipationManifestationMember() {
                                         id="carte-etudiant"
                                       />
                                       <label htmlFor="carte-etudiant" className="cursor-pointer">
-                                        <div className="space-y-3">
-                                          <div className="mx-auto w-16 h-16 rounded-lg bg-uh2c-blue/10 flex items-center justify-center">
-                                            <FileText className="h-8 w-8 text-uh2c-blue" />
+                                        <div className="space-y-2">
+                                          <div className="mx-auto w-12 h-12 rounded-lg bg-uh2c-blue/10 flex items-center justify-center">
+                                            <FileText className="h-6 w-6 text-uh2c-blue" />
                                           </div>
                                           <div>
                                             <p className="text-sm font-medium text-uh2c-blue">
