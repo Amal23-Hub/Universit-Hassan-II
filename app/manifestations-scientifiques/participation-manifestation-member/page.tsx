@@ -21,7 +21,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { etabUh2c } from "@/lib/etab-uh2c"
 import { DemandeParticipation, listeDemandesParticipationsManifestations } from "@/lib/demandes-participations-member"
 
-import { useParticipation } from '@/lib/participation-context'
+import { useParticipation, ParticipationProvider } from '@/lib/participation-context'
 
 // Interface pour les manifestations existantes
 interface ManifestationExistante {
@@ -84,7 +84,7 @@ const manifestationsExistantes: ManifestationExistante[] = [
   }
 ]
 
-export default function ParticipationManifestationMember() {
+function ParticipationManifestationMemberContent() {
 
   /***************Traitement****************/
   const [searchTerm, setSearchTerm] = useState("")
@@ -1601,5 +1601,13 @@ export default function ParticipationManifestationMember() {
         </main>
       </div>
     </div>
+  )
+}
+
+export default function ParticipationManifestationMember() {
+  return (
+    <ParticipationProvider>
+      <ParticipationManifestationMemberContent />
+    </ParticipationProvider>
   )
 }
