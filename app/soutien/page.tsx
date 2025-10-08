@@ -240,7 +240,7 @@ export default function SoutienPage() {
     },
     {
       id: "conference",
-      title: "Soutien à la conférence",
+      title: "Soutien à la mobilité",
       description: "Demande de soutien pour participer à des conférences",
       icon: MessageSquare,
       color: "bg-green-50 text-green-700 border-green-200"
@@ -254,15 +254,15 @@ export default function SoutienPage() {
     },
     {
       id: "ouvrage",
-      title: "Soutien à l'ouvrage",
+      title: "Soutien à l'édition d'ouvrage",
       description: "Demande de soutien pour publier des ouvrages de recherche",
       icon: Shield,
       color: "bg-orange-50 text-orange-700 border-orange-200"
     },
     {
       id: "brevet",
-      title: "Soutien au brevet",
-      description: "Demande de soutien pour l'enregistrement de brevets",
+      title: "Soutien au dépôt du brevet",
+      description: "Demande de soutien pour le dépôt de brevets",
       icon: FileSignature,
       color: "bg-red-50 text-red-700 border-red-200"
     },
@@ -328,7 +328,7 @@ export default function SoutienPage() {
                         }}
                       >
                         <div className="flex flex-col items-start">
-                          <span className="font-medium text-gray-900">Soutien à la conférence</span>
+                          <span className="font-medium text-gray-900">Soutien à la mobilité</span>
                           <span className="text-sm text-gray-500">Participer à des conférences</span>
                         </div>
                       </Button>
@@ -356,7 +356,7 @@ export default function SoutienPage() {
                         }}
                       >
                         <div className="flex flex-col items-start">
-                          <span className="font-medium text-gray-900">Soutien à l'ouvrage</span>
+                          <span className="font-medium text-gray-900">Soutien à l'édition d'ouvrage</span>
                           <span className="text-sm text-gray-500">Publier des ouvrages de recherche</span>
                         </div>
                       </Button>
@@ -370,7 +370,7 @@ export default function SoutienPage() {
                         }}
                       >
                         <div className="flex flex-col items-start">
-                          <span className="font-medium text-gray-900">Soutien à l'enregistrement au brevet</span>
+                          <span className="font-medium text-gray-900">Soutien au dépôt du brevet</span>
                           <span className="text-sm text-gray-500">Garder le même formulaire d'ajout d'un brevet dans le module production scientifique</span>
                         </div>
                       </Button>
@@ -1465,10 +1465,10 @@ export default function SoutienPage() {
                       <SelectContent>
                         <SelectItem value="all">Tous les types</SelectItem>
                         <SelectItem value="manifestation">Soutien à la manifestation</SelectItem>
-                        <SelectItem value="conference">Soutien à la conférence</SelectItem>
+                        <SelectItem value="conference">Soutien à la mobilité</SelectItem>
                         <SelectItem value="publication">Soutien à la publication</SelectItem>
-                        <SelectItem value="ouvrage">Soutien à l'ouvrage</SelectItem>
-                        <SelectItem value="brevet">Soutien au brevet</SelectItem>
+                        <SelectItem value="ouvrage">Soutien à l'édition d'ouvrage</SelectItem>
+                        <SelectItem value="brevet">Soutien au dépôt du brevet</SelectItem>
                         <SelectItem value="prime">Prime de publication</SelectItem>
                       </SelectContent>
                     </Select>
